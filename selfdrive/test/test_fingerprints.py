@@ -92,3 +92,4 @@ if not valid or len(fingerprints_flat) == 0:
   sys.exit(1)
 else:
   print("TEST SUCESSFUL")
+  

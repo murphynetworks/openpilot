@@ -94,7 +94,6 @@ def get_camera_can_parser(CP):
     signals += [
       ("Brake_On", "ES_CruiseThrottle", 0),
       ("Button", "ES_CruiseThrottle", 0),
-      ("Checksum", "ES_CruiseThrottle", 0),
       ("CloseDistance", "ES_CruiseThrottle", 0),
       ("Counter", "ES_CruiseThrottle", 0),
       ("Cruise_Activatedish", "ES_CruiseThrottle", 0),
@@ -198,7 +197,6 @@ class CarState():
       self.steer_not_allowed = cp.vl["Steering_Torque"]["LKA_Lockout"]
       self.button = cp_cam.vl["ES_CruiseThrottle"]["Button"]
       self.brake_hold = cp_cam.vl["ES_CruiseThrottle"]["Standstill"]
-      self.accel_checksum = cp_cam.vl["ES_CruiseThrottle"]["Checksum"]
       self.close_distance = cp_cam.vl["ES_CruiseThrottle"]["CloseDistance"]
       self.es_accel_msg = copy.copy(cp_cam.vl["ES_CruiseThrottle"])
       self.ready = not cp_cam.vl["ES_DashStatus"]["Not_Ready_Startup"] 

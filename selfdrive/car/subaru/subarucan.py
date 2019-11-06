@@ -12,7 +12,7 @@ def subaru_preglobal_checksum(packer, values, addr):
   dat = packer.make_can_msg(addr, 0, values)[2]
   return (sum(dat[:7])) % 256
 
-def create_steering_controldat = packer.make_can_msg("LKAS11", 0, values)[2](packer, car_fingerprint, apply_steer, frame, steer_step):
+def create_steering_control(packer, car_fingerprint, apply_steer, frame, steer_step):
 
   if car_fingerprint == CAR.IMPREZA:
     #counts from 0 to 15 then back to 0 + 16 for enable bit

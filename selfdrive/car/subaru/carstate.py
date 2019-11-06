@@ -193,7 +193,7 @@ class CarState():
         self.v_cruise_pcm *= CV.MPH_TO_KPH     
 
     if self.car_fingerprint in [CAR.OUTBACK, CAR.LEGACY]:
-      self.seatbelt_unlatched = 0
+      self.seatbelt_unlatched = False
       self.v_cruise_pcm = cp_cam.vl["ES_DashStatus"]["Cruise_Set_Speed"]
       self.steer_not_allowed = cp.vl["Steering_Torque"]["LKA_Lockout"]
       self.button = cp_cam.vl["ES_CruiseThrottle"]["Button"]

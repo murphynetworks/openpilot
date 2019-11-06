@@ -29,7 +29,7 @@ class CarController():
     self.es_lkas_cnt = -1
     self.counter = 0
     self.button_last = 0
-    self.resume_required = 1
+    self.resume_required = 0
 
     # Setup detection helper. Routes commands to
     # an appropriate CAN bus number.

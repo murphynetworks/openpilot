@@ -1,12 +1,12 @@
 const int SUBARU_MAX_STEER = 2047; // 1s
-int SUBARU_MAX_RATE_UP = 50;
-int SUBARU_MAX_RATE_DOWN = 70;
-int SUBARU_DRIVER_TORQUE_ALLOWANCE = 60;
-int SUBARU_DRIVER_TORQUE_FACTOR = 10;
 // real time torque limit to prevent controls spamming
 // the real time limit is 1500/sec
 const int SUBARU_MAX_RT_DELTA = 940;          // max delta torque allowed for real time checks
 const uint32_t SUBARU_RT_INTERVAL = 250000;    // 250ms between real time checks
+const int SUBARU_MAX_RATE_UP = 50;
+const int SUBARU_MAX_RATE_DOWN = 70;
+const int SUBARU_DRIVER_TORQUE_ALLOWANCE = 60;
+const int SUBARU_DRIVER_TORQUE_FACTOR = 10;
 
 int subaru_cruise_engaged_last = 0;
 int subaru_rt_torque_last = 0;
@@ -44,13 +44,6 @@ static int subaru_tx_hook(CAN_FIFOMailBox_TypeDef *to_send) {
   int tx = 1;
   int addr = GET_ADDR(to_send);
 
-  if (addr == 0x164) {
-    SUBARU_MAX_RATE_UP = 75;
-    SUBARU_MAX_RATE_DOWN = 75;
-    SUBARU_DRIVER_TORQUE_ALLOWANCE = 400;
-    SUBARU_DRIVER_TORQUE_FACTOR = 1;
-  }
-
   // steer cmd checks
   if ((addr == 0x122) || (addr == 0x164)) {
     int bit_shift = (addr == 0x122) ? 16 : 8;
@@ -58,6 +51,7 @@ static int subaru_tx_hook(CAN_FIFOMailBox_TypeDef *to_send) {
     bool violation = 0;
     uint32_t ts = TIM2->CNT;
     desired_torque = to_signed(desired_torque, 13);
+
     if (controls_allowed) {
 
       // *** global torque limit check ***
@@ -95,7 +89,7 @@ static int subaru_tx_hook(CAN_FIFOMailBox_TypeDef *to_send) {
       subaru_ts_last = ts;
     }
 
-    if (violation != 0) {
+    if (violation) {
       tx = 0;
     }
 
@@ -108,10 +102,9 @@ static int subaru_fwd_hook(int bus_num, CAN_FIFOMailBox_TypeDef *to_fwd) {
   int bus_fwd = -1;
   if (bus_num == 0) {
     bus_fwd = 2;  // Camera CAN
-  } 
+  }
   if (bus_num == 2) {
     // 290 is LKAS for Global Platform
-    // 353 is ES_CruiseThrottle for outback 2015
     // 356 is LKAS for outback 2015
     // 545 is ES_Distance
     // 802 is ES_LKAS

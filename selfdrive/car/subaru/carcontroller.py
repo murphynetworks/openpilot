@@ -36,7 +36,6 @@ class CarController():
     # Setup detection helper. Routes commands to
     # an appropriate CAN bus number.
     self.params = CarControllerParams(car_fingerprint)
-    print(DBC)
     self.packer = CANPacker(DBC[car_fingerprint]['pt'])
 
   def update(self, enabled, CS, frame, actuators, pcm_cancel_cmd, visual_alert, left_line, right_line):

@@ -1,4 +1,3 @@
-#from common.numpy_fast import clip
 from selfdrive.car import apply_std_steer_torque_limits
 from selfdrive.car.subaru import subarucan
 from selfdrive.car.subaru.values import CAR, DBC
@@ -7,38 +6,33 @@ from selfdrive.can.packer import CANPacker
 
 class CarControllerParams():
   def __init__(self, car_fingerprint):
-    self.STEER_MAX = 2047                 # max_steer 2047
-    self.STEER_STEP = 2                   # how often we update the steer cmd
+    self.STEER_MAX = 2047              # max_steer 4095
+    self.STEER_STEP = 2                # how often we update the steer cmd
+    self.STEER_DELTA_UP = 70           # torque increase per refresh, 0.58s to max
+    self.STEER_DELTA_DOWN = 70         # torque decrease per refresh
     if car_fingerprint == CAR.IMPREZA:
-      self.STEER_DRIVER_ALLOWANCE = 60    # allowed driver torque before start limiting
+      self.STEER_DRIVER_ALLOWANCE = 60   # allowed driver torque before start limiting
       self.STEER_DRIVER_MULTIPLIER = 10   # weight driver torque heavily
-      self.STEER_DRIVER_FACTOR = 1        # from dbc
-      self.STEER_DELTA_UP = 50            # torque increase per refresh, 0.8s to max
-      self.STEER_DELTA_DOWN = 70          # torque decrease per refresh
+      self.STEER_DRIVER_FACTOR = 1     # from dbc
     if car_fingerprint in (CAR.OUTBACK, CAR.LEGACY):
-      self.STEER_DRIVER_ALLOWANCE = 400   # allowed driver torque before start limiting
-      self.STEER_DRIVER_MULTIPLIER = 1    # weight driver torque heavily
-      self.STEER_DRIVER_FACTOR = 1        # from dbc
-      self.STEER_DELTA_UP = 75            # torque increase per refresh, 0.54s to max
-      self.STEER_DELTA_DOWN = 75          # torque decrease per refresh
+      self.STEER_DRIVER_ALLOWANCE = 600   # allowed driver torque before start limiting
+      self.STEER_DRIVER_MULTIPLIER = 1   # weight driver torque heavily
+      self.STEER_DRIVER_FACTOR = 1     # from dbc
 
 
-class CarController(object):
+class CarController():
   def __init__(self, car_fingerprint):
-    self.lkas_active = False
-    self.steer_idx = 0
     self.apply_steer_last = 0
     self.car_fingerprint = car_fingerprint
     self.es_distance_cnt = -1
     self.es_lkas_cnt = -1
     self.counter = 0
     self.button_last = 0
-    self.sng_reenable = 0
+    self.resume_required = 0
 
     # Setup detection helper. Routes commands to
     # an appropriate CAN bus number.
     self.params = CarControllerParams(car_fingerprint)
-    print(DBC)
     self.packer = CANPacker(DBC[car_fingerprint]['pt'])
 
   def update(self, enabled, CS, frame, actuators, pcm_cancel_cmd, visual_alert, left_line, right_line):
@@ -87,30 +81,29 @@ class CarController(object):
     # button control
     if (frame % 5) == 0 and self.car_fingerprint in (CAR.OUTBACK, CAR.LEGACY):
       # 1 = main, 2 = set shallow, 3 = set deep, 4 = resume shallow, 5 = resume deep
-      self.fake_button = CS.button 
-      self.checksum_offset = 0
-      
+      fake_button = CS.button
+
+      # cancel and resume when lead car is greater than 1.8m away to remove standstill bit
+      if CS.brake_hold and CS.close_distance > 1.2 and enabled:
+        fake_button = 1
+        self.resume_required = 1
+      if self.resume_required == 1 and not enabled and not CS.brake_hold and CS.main_on:
+        fake_button = 4
+        self.resume_required = 0
+
       # disengage ACC when OP is disengaged
-      if pcm_cancel_cmd:
-        self.fake_button = 1
-        self.checksum_offset = self.fake_button
-
-      # resume
-      if CS.standstill and CS.close_distance > 95 and enabled:
-        self.fake_button = 4
-        self.checksum_offset = self.fake_button
-
-      # always on pre-enable
-      if CS.main_on == 0 and CS.ready == 1:
-        self.fake_button = 1
-        self.checksum_offset = self.fake_button
+      if (pcm_cancel_cmd and enabled):
+        fake_button = 1
+      # turn main on if off
+      if not CS.main_on and CS.ready:
+        fake_button = 1
 
       # unstick previous mocked button press
       if self.button_last != 0:
-        self.fake_button = self.button_last
-        self.checksum_offset = self.fake_button
+        fake_button = self.button_last
       self.button_last = CS.button
 
-      can_sends.append(subarucan.create_es_throttle_control(self.packer, self.fake_button, CS.accel_checksum, CS.button, self.checksum_offset, CS.es_accel_msg))
+      can_sends.append(subarucan.create_es_throttle_control(self.packer, fake_button, CS.es_accel_msg))
 
     return can_sends
+    

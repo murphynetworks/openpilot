@@ -38,8 +38,15 @@ FINGERPRINTS = {
 
 STEER_THRESHOLD = {
   CAR.IMPREZA: 80,
-  CAR.OUTBACK: 400,
-  CAR.LEGACY: 400,
+  CAR.OUTBACK: 600,
+  CAR.LEGACY: 600,
+}
+
+class ECU:
+  CAM = 0
+
+ECU_FINGERPRINT = {
+  ECU.CAM: [290, 356],   # steer torque cmd
 }
 
 DBC = {

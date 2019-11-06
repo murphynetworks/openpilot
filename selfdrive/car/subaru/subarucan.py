@@ -10,9 +10,9 @@ def subaru_checksum(packer, values, addr):
 
 def subaru_preglobal_checksum(packer, values, addr):
   dat = packer.make_can_msg(addr, 0, values)[2]
-  return (sum(dat[1:]) + (addr >> 8)) % 256
+  return (sum(dat[:7])) % 256
 
-def create_steering_control(packer, car_fingerprint, apply_steer, frame, steer_step):
+def create_steering_controldat = packer.make_can_msg("LKAS11", 0, values)[2](packer, car_fingerprint, apply_steer, frame, steer_step):
 
   if car_fingerprint == CAR.IMPREZA:
     #counts from 0 to 15 then back to 0 + 16 for enable bit
@@ -35,7 +35,7 @@ def create_steering_control(packer, car_fingerprint, apply_steer, frame, steer_s
       "LKAS_Command": apply_steer,
       "LKAS_Active": 1 if apply_steer != 0 else 0
     }
-    values["Checksum"] = subaru_preglobal_checksum(packer, values, 0x164)
+    values["Checksum"] = subaru_preglobal_checksum(packer, values, "ES_LKAS")
 
   return packer.make_can_msg("ES_LKAS", 0, values)
 
@@ -75,6 +75,6 @@ def create_es_throttle_control(packer, fake_button, es_accel_msg):
   values = copy.copy(es_accel_msg)
   values["Button"] = fake_button
 
-  values["Checksum"] = subaru_preglobal_checksum(packer, values, 0x161)
+  values["Checksum"] = subaru_preglobal_checksum(packer, values, "ES_CruiseThrottle")
 
   return packer.make_can_msg("ES_CruiseThrottle", 0, values)

@@ -27,8 +27,7 @@ class CarController():
     self.es_distance_cnt = -1
     self.es_lkas_cnt = -1
     self.counter = 0
-    self.button_last = 0
-    self.resume_required = 0
+    self.fake_button_prev = 0
 
     # Setup detection helper. Routes commands to
     # an appropriate CAN bus number.
@@ -80,41 +79,37 @@ class CarController():
 
     # button control
     if (frame % 5) == 0 and self.car_fingerprint in (CAR.OUTBACK, CAR.LEGACY):
-      # 1 = main, 2 = set shallow, 3 = set deep, 4 = resume shallow, 5 = resume deep
+      # 1 = main, 2 = set shallow/slow down 1, 3 = set deep/slow down 10, 4 = resume shallow/speed up 1, 5 = resume deep/speed up 10
       fake_button = CS.button
+      if enabled:
+        # change stock speed to match openpilot set speed
+        # if stock is less than openpilot, press resume to raise speed
+        if CS.stock_set_speed != CS.v_cruise_pcm and not CS.standstill:
+          if (CS.v_cruise_pcm - CS.stock_set_speed) >= 10:
+            fake_button = 5
+          if 0 < (CS.v_cruise_pcm - CS.stock_set_speed) < 10:
+            fake_button = 4
+        # if stock is higher than openpilot, press set to lower speed
+          if (CS.stock_set_speed - CS.v_cruise_pcm) >= 10:
+            fake_button = 3
+          if 0 < (CS.stock_set_speed - CS.v_cruise_pcm) < 10:
+            fake_button = 2
 
-      # spam resume when stopped and engaged
-      if CS.standstill and enabled:
-        if CS.v_cruise_pcm_stock > 140:
-          fake_button = 2
-        else:
-          fake_button = 4
-
-      # change stock speed to match openpilot set speed
-      # if stock is less than openpilot, press resume to raise speed
-      if enabled and CS.v_cruise_pcm_stock < CS.v_cruise_pcm:
-        if (CS.v_cruise_pcm - CS.v_cruise_pcm_stock) >= 10:
-          fake_button = 5
-        if 0 < (CS.v_cruise_pcm - CS.v_cruise_pcm_stock) < 10:
-          fake_button = 4
-      # if stock is higher than openpilot, press set to lower speed
-      if enabled and CS.v_cruise_pcm_stock > CS.v_cruise_pcm:
-        if (CS.v_cruise_pcm_stock - CS.v_cruise_pcm) > 10:
-          fake_button = 3
-        if 0 < (CS.v_cruise_pcm_stock - CS.v_cruise_pcm) < 10:
-          fake_button = 2
+        # spam set when stopped and engaged
+        if CS.standstill:
+            fake_button = 2
 
       # disengage ACC when OP is disengaged
-      if pcm_cancel_cmd and enabled:
+      if pcm_cancel_cmd:
         fake_button = 1
       # turn main on if off
       if not CS.main_on and CS.ready:
         fake_button = 1
 
       # unstick previous mocked button press
-      if self.button_last != 0:
-        fake_button = self.button_last
-      self.button_last = CS.button
+      if fake_button != 0 and fake_button == self.fake_button_prev:
+        fake_button = 0
+      self.fake_button_prev = fake_button
 
       can_sends.append(subarucan.create_es_throttle_control(self.packer, fake_button, CS.es_accel_msg))
 

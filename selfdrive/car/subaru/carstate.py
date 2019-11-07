@@ -127,11 +127,10 @@ class CarState():
     self.prev_left_blinker_on = False
     self.right_blinker_on = False
     self.prev_right_blinker_on = False
-    self.steer_torque_driver = 0
     self.steer_not_allowed = False
-    self.main_on = False
     if self.car_fingerprint in [CAR.OUTBACK, CAR.LEGACY]:
       self.v_cruise_pcm = 0
+      self.main_on_prev = 0
 
     # vEgo kalman filter
     dt = 0.01
@@ -169,7 +168,7 @@ class CarState():
     self.prev_left_blinker_on = self.left_blinker_on
     self.prev_right_blinker_on = self.right_blinker_on
     self.left_blinker_on = cp.vl["Dashlights"]['LEFT_BLINKER'] == 1
-    self.right_blinker_on = cp.vl["Dashlights"]['RIGHT_BLINKER'] == 1
+    self.right_blinker_on = cp.vl["Dashlights"]['RIGHT_BLINKER'] == 1    
     self.steer_torque_driver = cp.vl["Steering_Torque"]['Steer_Torque_Sensor']
     self.steer_torque_motor = cp.vl["Steering_Torque"]['Steer_Torque_Output']
     self.acc_active = cp.vl["CruiseControl"]['Cruise_Activated']
@@ -202,20 +201,23 @@ class CarState():
       self.ready = not cp_cam.vl["ES_DashStatus"]["Not_Ready_Startup"] 
 
       # 1 = main, 2 = set shallow, 3 = set deep, 4 = resume shallow, 5 = resume deep
-      self.v_cruise_pcm_stock = cp_cam.vl["ES_DashStatus"]["Cruise_Set_Speed"]
-      if self.acc_active and self.v_cruise_pcm == 0:
-        self.v_cruise_pcm = self.v_cruise_pcm_stock
-      if self.acc_active and self.button !=0:
-        if self.button == 2:
-          self.v_cruise_pcm =- 1
-        if self.button == 3:
-          self.v_cruise_pcm = self.v_ego
+      self.stock_set_speed = cp_cam.vl["ES_DashStatus"]["Cruise_Set_Speed"]
+
+      if self.acc_active and self.v_cruise_pcm < 30:
+        self.v_cruise_pcm = self.stock_set_speed
+      if self.acc_active and self.button in [2,3,4,5]:          
+        if self.button in [2,3]:
+          if self.stock_set_speed > self.v_ego:
+            self.v_cruise_pcm = self.v_ego
+          if self.stock_set_speed <= self.v_ego:
+            if self.button == 2:
+              self.v_cruise_pcm =- 1
+            if self.button == 3:
+              self.v_cruise_pcm =-10
         if self.button == 4:
           self.v_cruise_pcm =+ 1
         if self.button == 5:
           self.v_cruise_pcm =+ 10
-      else:
-        self.v_cruise_pcm =+ 0
       if not self.main_on:
-        self.v_cruise_pcm = self.v_cruise_pcm_stock
+        self.v_cruise_pcm = self.stock_set_speed
         

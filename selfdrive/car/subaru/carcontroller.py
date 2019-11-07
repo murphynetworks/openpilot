@@ -83,16 +83,29 @@ class CarController():
       # 1 = main, 2 = set shallow, 3 = set deep, 4 = resume shallow, 5 = resume deep
       fake_button = CS.button
 
-      # cancel and resume when lead car is greater than 1.8m away to remove standstill bit
-      if CS.brake_hold and CS.close_distance > 1.2 and enabled:
-        fake_button = 1
-        self.resume_required = 1
-      if self.resume_required == 1 and not enabled and not CS.brake_hold and CS.main_on:
-        fake_button = 4
-        self.resume_required = 0
+      # spam resume when stopped and engaged
+      if CS.standstill and enabled:
+        if CS.v_cruise_pcm_stock > 140:
+          fake_button = 2
+        else:
+          fake_button = 4
+
+      # change stock speed to match openpilot set speed
+      # if stock is less than openpilot, press resume to raise speed
+      if enabled and CS.v_cruise_pcm_stock < CS.v_cruise_pcm:
+        if (CS.v_cruise_pcm - CS.v_cruise_pcm_stock) >= 10:
+          fake_button = 5
+        if 0 < (CS.v_cruise_pcm - CS.v_cruise_pcm_stock) < 10:
+          fake_button = 4
+      # if stock is higher than openpilot, press set to lower speed
+      if enabled and CS.v_cruise_pcm_stock > CS.v_cruise_pcm:
+        if (CS.v_cruise_pcm_stock - CS.v_cruise_pcm) > 10:
+          fake_button = 3
+        if 0 < (CS.v_cruise_pcm_stock - CS.v_cruise_pcm) < 10:
+          fake_button = 2
 
       # disengage ACC when OP is disengaged
-      if (pcm_cancel_cmd and enabled):
+      if pcm_cancel_cmd and enabled:
         fake_button = 1
       # turn main on if off
       if not CS.main_on and CS.ready:

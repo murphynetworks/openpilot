@@ -130,6 +130,8 @@ class CarState():
     self.steer_torque_driver = 0
     self.steer_not_allowed = False
     self.main_on = False
+    if self.car_fingerprint in [CAR.OUTBACK, CAR.LEGACY]:
+      self.v_cruise_pcm = 0
 
     # vEgo kalman filter
     dt = 0.01
@@ -151,8 +153,6 @@ class CarState():
     self.v_wheel_fr = cp.vl["Wheel_Speeds"]['FR'] * CV.KPH_TO_MS
     self.v_wheel_rl = cp.vl["Wheel_Speeds"]['RL'] * CV.KPH_TO_MS
     self.v_wheel_rr = cp.vl["Wheel_Speeds"]['RR'] * CV.KPH_TO_MS
-
-    self.v_cruise_pcm = cp_cam.vl["ES_DashStatus"]['Cruise_Set_Speed']
 
     v_wheel = (self.v_wheel_fl + self.v_wheel_fr + self.v_wheel_rl + self.v_wheel_rr) / 4.
     # Kalman filter, even though Subaru raw wheel speed is heaviliy filtered by default
@@ -182,6 +182,7 @@ class CarState():
       cp.vl["BodyInfo"]['DOOR_OPEN_FL']])
 
     if self.car_fingerprint == CAR.IMPREZA:
+      self.v_cruise_pcm = cp_cam.vl["ES_DashStatus"]['Cruise_Set_Speed']
       self.seatbelt_unlatched = cp.vl["Dashlights"]['SEATBELT_FL'] == 1
       self.v_cruise_pcm = cp_cam.vl["ES_DashStatus"]["Cruise_Set_Speed"] * CV.MPH_TO_KPH
       self.steer_not_allowed = 0
@@ -193,11 +194,28 @@ class CarState():
 
     if self.car_fingerprint in [CAR.OUTBACK, CAR.LEGACY]:
       self.seatbelt_unlatched = False
-      self.v_cruise_pcm = cp_cam.vl["ES_DashStatus"]["Cruise_Set_Speed"]
       self.steer_not_allowed = cp.vl["Steering_Torque"]["LKA_Lockout"]
       self.button = cp_cam.vl["ES_CruiseThrottle"]["Button"]
       self.brake_hold = cp_cam.vl["ES_CruiseThrottle"]["Standstill"]
       self.close_distance = cp_cam.vl["ES_CruiseThrottle"]["CloseDistance"]
       self.es_accel_msg = copy.copy(cp_cam.vl["ES_CruiseThrottle"])
       self.ready = not cp_cam.vl["ES_DashStatus"]["Not_Ready_Startup"] 
-      
+
+      # 1 = main, 2 = set shallow, 3 = set deep, 4 = resume shallow, 5 = resume deep
+      self.v_cruise_pcm_stock = cp_cam.vl["ES_DashStatus"]["Cruise_Set_Speed"]
+      if self.acc_active and self.v_cruise_pcm == 0:
+        self.v_cruise_pcm = self.v_cruise_pcm_stock
+      if self.acc_active and self.button !=0:
+        if self.button == 2:
+          self.v_cruise_pcm =- 1
+        if self.button == 3:
+          self.v_cruise_pcm = self.v_ego
+        if self.button == 4:
+          self.v_cruise_pcm =+ 1
+        if self.button == 5:
+          self.v_cruise_pcm =+ 10
+      else:
+        self.v_cruise_pcm =+ 0
+      if not self.main_on:
+        self.v_cruise_pcm = self.v_cruise_pcm_stock
+        

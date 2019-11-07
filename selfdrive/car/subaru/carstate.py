@@ -130,7 +130,6 @@ class CarState():
     self.steer_not_allowed = False
     if self.car_fingerprint in [CAR.OUTBACK, CAR.LEGACY]:
       self.v_cruise_pcm = 0
-      self.main_on_prev = 0
 
     # vEgo kalman filter
     dt = 0.01

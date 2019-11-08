@@ -208,8 +208,8 @@ class CarState():
         self.v_cruise_pcm = self.stock_set_speed
       if self.acc_active and self.button in [2,3,4,5] and self.button_count == 0:
         if self.button in [2,3]:
-          if self.stock_set_speed > (self.v_ego * CV.MS_TO_KPH):
-            self.v_cruise_pcm = max(round((self.v_ego * CV.MS_TO_KPH) / 5) * 5, 30)
+          if self.stock_set_speed < (self.v_ego * CV.MS_TO_KPH):
+            self.v_cruise_pcm = round((self.v_ego * CV.MS_TO_KPH) / 5) * 5
           else:
             if self.button == 2:
               self.v_cruise_pcm = int(self.v_cruise_pcm / 5) * 5

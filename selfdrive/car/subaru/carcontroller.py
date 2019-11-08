@@ -94,7 +94,7 @@ class CarController():
           if (CS.stock_set_speed - CS.v_cruise_pcm) >= 10:
             fake_button = 3
           if 0 < (CS.stock_set_speed - CS.v_cruise_pcm) < 10:
-            fake_button = 4
+            fake_button = 2
 
       # disengage ACC when OP is disengaged
       if pcm_cancel_cmd:

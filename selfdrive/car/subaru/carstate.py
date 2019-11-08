@@ -217,7 +217,7 @@ class CarState():
         else:     # button 5
           self.v_cruise_pcm = (int(self.v_cruise_pcm / 10) + 1) * 10
       if self.acc_active and not self.acc_active_prev:
-        self.v_cruise_pcm = self.v_ego
+        self.v_cruise_pcm = self.v_ego * CV.MS_TO_KPH
         # change set speed at 5hz instead of 100hz 
       if self.button == self.button_prev and self.button_count <= 20:
         self.button_count =+ 1

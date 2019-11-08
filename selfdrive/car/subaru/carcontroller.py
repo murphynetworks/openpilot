@@ -81,7 +81,7 @@ class CarController():
     if (frame % 5) == 0 and self.car_fingerprint in (CAR.OUTBACK, CAR.LEGACY):
       # 1 = main, 2 = set shallow/slow down 1, 3 = set deep/slow down 10, 4 = resume shallow/speed up 1, 5 = resume deep/speed up 10
       fake_button = CS.button
-      if enabled and CS.v_wheel > 1 and (frame % 15) == 0:
+      if enabled and CS.v_ego_raw > 1 and (frame % 15) == 0:
         # change stock speed to match openpilot set speed
         # if stock is less than openpilot, press resume to raise speed
         if CS.stock_set_speed != CS.v_cruise_pcm:
@@ -107,7 +107,7 @@ class CarController():
         fake_button = 0
 
       # spam set when stopped and engaged
-      if enabled and CS.v_wheel <= 1:
+      if enabled and CS.v_ego_raw <= 1:
           fake_button = 2
 
       self.fake_button_prev = fake_button

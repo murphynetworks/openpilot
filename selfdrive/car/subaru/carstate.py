@@ -132,6 +132,7 @@ class CarState():
       self.v_cruise_pcm = 0
       self.button_prev = 0
       self.button_count = 0
+      self.acc_active_prev = 0
 
     # vEgo kalman filter
     dt = 0.01
@@ -204,23 +205,25 @@ class CarState():
       # 1 = main, 2 = set shallow, 3 = set deep, 4 = resume shallow, 5 = resume deep
       self.stock_set_speed = cp_cam.vl["ES_DashStatus"]["Cruise_Set_Speed"]
 
-      if self.acc_active and self.v_cruise_pcm < 30:
+      if self.acc_active and self.v_cruise_pcm == 0:
         self.v_cruise_pcm = self.stock_set_speed
       if self.acc_active and self.button in [2,3,4,5] and self.button_count == 0:
-        if self.button in [2,3]:
-          if self.button == 2:
-            self.v_cruise_pcm = int(self.v_cruise_pcm / 5) * 5
-          else: # button 3
-            self.v_cruise_pcm = int(self.v_cruise_pcm / 10) * 10
+        if self.button == 2:
+            self.v_cruise_pcm = (int(self.v_cruise_pcm / 5) - 1) * 5
+        elif self.button == 3:
+            self.v_cruise_pcm = (int(self.v_cruise_pcm / 10) - 1) * 10
         elif self.button == 4:
           self.v_cruise_pcm = (int(self.v_cruise_pcm / 5) + 1) * 5
         else:     # button 5
           self.v_cruise_pcm = (int(self.v_cruise_pcm / 10) + 1) * 10
+      if self.acc_active and not self.acc_active_prev:
+        self.v_cruise_pcm = self.v_ego
         # change set speed at 5hz instead of 100hz 
       if self.button == self.button_prev and self.button_count <= 20:
         self.button_count =+ 1
       else:
         self.button_count = 0 
       self.button_prev = self.button
+      self.acc_active_prev = self.acc_active
       if not self.main_on:
         self.v_cruise_pcm = self.stock_set_speed

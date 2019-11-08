@@ -188,7 +188,7 @@ class CarState():
       self.es_lkas_msg = copy.copy(cp_cam.vl["ES_LKAS_State"])
       # 1 = imperial, 6 = metric
       if cp.vl["Dash_State"]['Units'] == 1:
-        self.v_cruise_pcm *= CV.MPH_TO_KPH     
+        self.v_cruise_pcm *= CV.MPH_TO_KPH
 
     if self.car_fingerprint in [CAR.OUTBACK, CAR.LEGACY]:
       self.seatbelt_unlatched = False
@@ -197,26 +197,25 @@ class CarState():
       self.brake_hold = cp_cam.vl["ES_CruiseThrottle"]["Standstill"]
       self.close_distance = cp_cam.vl["ES_CruiseThrottle"]["CloseDistance"]
       self.es_accel_msg = copy.copy(cp_cam.vl["ES_CruiseThrottle"])
-      self.ready = not cp_cam.vl["ES_DashStatus"]["Not_Ready_Startup"] 
+      self.ready = not cp_cam.vl["ES_DashStatus"]["Not_Ready_Startup"]
 
       # 1 = main, 2 = set shallow, 3 = set deep, 4 = resume shallow, 5 = resume deep
       self.stock_set_speed = cp_cam.vl["ES_DashStatus"]["Cruise_Set_Speed"]
 
       if self.acc_active and self.v_cruise_pcm < 30:
         self.v_cruise_pcm = self.stock_set_speed
-      if self.acc_active and self.button in [2,3,4,5]:          
+      if self.acc_active and self.button in [2,3,4,5]:
         if self.button in [2,3]:
           if self.stock_set_speed > self.v_ego:
             self.v_cruise_pcm = self.v_ego
-          if self.stock_set_speed <= self.v_ego:
+          else:
             if self.button == 2:
-              self.v_cruise_pcm =- 1
-            if self.button == 3:
-              self.v_cruise_pcm =-10
-        if self.button == 4:
-          self.v_cruise_pcm =+ 1
-        if self.button == 5:
-          self.v_cruise_pcm =+ 10
+              self.v_cruise_pcm = int(self.v_cruise_pcm / 5) * 5
+            else: # button 3
+              self.v_cruise_pcm = int(self.v_cruise_pcm / 10) * 10
+        elif self.button == 4:
+          self.v_cruise_pcm = (int(self.v_cruise_pcm / 5) + 1) * 5
+        else:     # button 5
+          self.v_cruise_pcm = (int(self.v_cruise_pcm / 10) + 1) * 10
       if not self.main_on:
         self.v_cruise_pcm = self.stock_set_speed
-        

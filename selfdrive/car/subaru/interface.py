@@ -70,8 +70,8 @@ class CarInterface(CarInterfaceBase):
     if candidate in [CAR.OUTBACK]:
       ret.mass = 1568 + STD_CARGO_KG
       ret.wheelbase = 2.67
-      ret.steerRatio = 20
-      ret.steerActuatorDelay = 0.07
+      ret.steerRatio = 14
+      ret.steerActuatorDelay = 0.2
       ret.lateralTuning.pid.kf = 0.000043
       ret.lateralTuning.pid.kiBP, ret.lateralTuning.pid.kpBP = [[0., 10., 20.], [0., 10., 20.]]
       ret.lateralTuning.pid.kpV, ret.lateralTuning.pid.kiV = [[0.01, 0.05, 0.2], [0.003, 0.018, 0.025]]

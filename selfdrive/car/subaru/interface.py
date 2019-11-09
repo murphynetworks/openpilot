@@ -55,7 +55,7 @@ class CarInterface(CarInterfaceBase):
 
     ret.steerRateCost = 0.7
     ret.steerMaxBP = [0.] # m/s
-    ret.steerMaxV = [0.5]
+    ret.steerMaxV = [0.0294]
     ret.centerToFront = ret.wheelbase * 0.5
     ret.transmissionType = car.CarParams.TransmissionType.automatic
 

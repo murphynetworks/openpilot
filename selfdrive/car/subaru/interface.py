@@ -80,7 +80,7 @@ class CarInterface(CarInterfaceBase):
       ret.lateralTuning.pid.kiBP, ret.lateralTuning.pid.kpBP = [[0., 10., 20.], [0., 10., 20.]]
       ret.lateralTuning.pid.kpV, ret.lateralTuning.pid.kiV = [[0.01, 0.05, 0.2], [0.003, 0.018, 0.025]]
       ret.steerMaxBP = [0.] # m/s
-      ret.steerMaxV = [1.]
+      ret.steerMaxV = [0.0294]
 
     if candidate in [CAR.LEGACY]:
       ret.mass = 1568 + STD_CARGO_KG

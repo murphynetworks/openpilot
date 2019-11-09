@@ -83,7 +83,7 @@ class CarController():
       # 1 = main, 2 = set shallow/slow down 1, 3 = set deep/slow down 10, 4 = resume shallow/speed up 1, 5 = resume deep/speed up 10
       fake_button = CS.button
       if enabled and (CS.v_ego_raw * CV.MS_TO_KPH) > 1 and (frame % 30) == 0:
-        target_speed = (min(CS.v_cruise_pcm, max(v_acc_sol * CV.MS_TO_KPH, 30))
+        target_speed = int(min(CS.v_cruise_pcm, max(v_acc_sol * CV.MS_TO_KPH, 30)))
         # change stock speed to match openpilot set speed
         # if stock is less than openpilot, press resume to raise speed
         if CS.stock_set_speed != target_speed:

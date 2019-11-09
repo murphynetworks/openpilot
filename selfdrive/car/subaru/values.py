@@ -4,6 +4,7 @@ class CAR:
   IMPREZA = "SUBARU IMPREZA LIMITED 2019"
   OUTBACK = "SUBARU OUTBACK 2015 - 2017"
   LEGACY = "SUBARU LEGACY 2015 - 2017"
+  FORESTER = "SUBARU FORESTER 2017"
 
 
 FINGERPRINTS = {
@@ -31,12 +32,17 @@ FINGERPRINTS = {
   {
     2: 8, 208: 8, 209: 4, 210: 8, 211: 7, 212: 8, 316: 8, 320: 8, 321: 8, 324: 8, 328: 8, 329: 8, 336: 2, 338: 8, 342: 8, 392: 8, 604: 8, 640: 8, 642: 8, 864: 8, 865: 8, 866: 8, 872: 8, 880: 8, 881: 8, 882: 8, 884: 8, 885: 8, 977: 8, 1614: 8, 1632: 8, 1640: 8, 1657: 8, 1658: 8, 1672: 8, 1722: 8, 1743: 8, 1745: 8, 1778: 8, 1785: 5, 1786: 5, 1787: 5, 1788: 8, 2015: 8, 2016: 8, 2024: 8
   }],
+  #FORESTER PREMIUM 2.5i 2017
+  CAR.FORESTER: [{
+    2: 8, 112: 8, 117: 8, 128: 8, 208: 8, 209: 4, 210: 8, 211: 7, 212: 8, 320: 8, 321: 8, 324: 8, 328: 8, 329: 8, 336: 2, 338: 8, 340: 7, 342: 8, 352: 8, 353: 8, 354: 8, 355: 8, 356: 8, 554: 8,604: 8, 640: 8, 641: 8, 642: 8, 805: 8, 864: 8, 865: 8, 866: 8, 872: 8, 880: 8, 881: 8, 882: 8, 884: 8, 885: 8, 886: 1, 888: 8, 977: 8, 1398: 8, 1632: 8, 1743: 8, 1744: 8, 1745: 8, 1785: 5, 1786: 5, 1787: 5, 1788: 8, 1882: 8, 1895: 8, 1903: 8, 1986: 8, 1994: 8, 2015: 8, 2016: 8, 2024: 8
+  }],
 }
 
 STEER_THRESHOLD = {
   CAR.IMPREZA: 80,
   CAR.OUTBACK: 600,
   CAR.LEGACY: 600,
+  CAR.FORESTER: 600,
 }
 
 class ECU:
@@ -50,4 +56,5 @@ DBC = {
   CAR.IMPREZA: dbc_dict('subaru_global_2017', None),
   CAR.OUTBACK: dbc_dict('subaru_outback_2015_eyesight', None),
   CAR.LEGACY: dbc_dict('subaru_outback_2015_eyesight', None),
+  CAR.FORESTER: dbc_dict('subaru_outback_2015_eyesight', None),
 }

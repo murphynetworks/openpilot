@@ -14,7 +14,7 @@ class CarControllerParams():
       self.STEER_DRIVER_ALLOWANCE = 60   # allowed driver torque before start limiting
       self.STEER_DRIVER_MULTIPLIER = 10  # weight driver torque heavily
       self.STEER_DRIVER_FACTOR = 1       # from dbc
-    if car_fingerprint in (CAR.OUTBACK, CAR.LEGACY):
+    if car_fingerprint in (CAR.OUTBACK, CAR.LEGACY, CAR.FORESTER):
       self.STEER_DRIVER_ALLOWANCE = 600  # allowed driver torque before start limiting
       self.STEER_DRIVER_MULTIPLIER = 1   # weight driver torque heavily
       self.STEER_DRIVER_FACTOR = 1       # from dbc
@@ -51,7 +51,7 @@ class CarController():
       # limits due to driver torque
       apply_steer = apply_std_steer_torque_limits(apply_steer, self.apply_steer_last, CS.steer_torque_driver, P)
 
-      if self.car_fingerprint in (CAR.OUTBACK, CAR.LEGACY):
+      if self.car_fingerprint in (CAR.OUTBACK, CAR.LEGACY, CAR.FORESTER):
         # add noise to prevent lkas fault from constant torque value for over 1s
         if enabled and apply_steer == self.apply_steer_last:
           self.counter =+ 1
@@ -74,7 +74,7 @@ class CarController():
         self.es_lkas_cnt = CS.es_lkas_msg["Counter"]
 
     # button control
-    if (frame % 5) == 0 and self.car_fingerprint in (CAR.OUTBACK, CAR.LEGACY):
+    if (frame % 5) == 0 and self.car_fingerprint in (CAR.OUTBACK, CAR.LEGACY, CAR.FORESTER):
       # 1 = main, 2 = set shallow, 3 = set deep, 4 = resume shallow, 5 = resume deep
       # disengage ACC when OP is disengaged
       if (pcm_cancel_cmd):

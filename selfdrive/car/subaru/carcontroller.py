@@ -82,23 +82,26 @@ class CarController():
     if (frame % 5) == 0 and self.car_fingerprint in (CAR.OUTBACK, CAR.LEGACY):
       # 1 = main, 2 = set shallow/slow down 1, 3 = set deep/slow down 10, 4 = resume shallow/speed up 1, 5 = resume deep/speed up 10
       fake_button = CS.button
-      if enabled and (CS.v_ego_raw * CV.MS_TO_KPH) > 1 and (frame % 20) == 0:
+      if enabled and (CS.v_ego_raw * CV.MS_TO_KPH) > 1 and (frame % 25) == 0:
         # change stock speed to match openpilot set speed
         # if stock is less than openpilot, press resume to raise speed
         if CS.stock_set_speed != CS.v_cruise_pcm:
+          # if openpilot is higher than stock by 10 or greater
           if (CS.v_cruise_pcm - CS.stock_set_speed) >= 10:
             fake_button = 5
-          if 0 < (CS.v_cruise_pcm - CS.stock_set_speed) < 10:
+          # if openpilot is lower than stock by 10 or less
+          elif 0 < (CS.v_cruise_pcm - CS.stock_set_speed) < 10:
             fake_button = 4
-        # if stock is higher than openpilot, press set to lower speed
-          if (CS.stock_set_speed - CS.v_cruise_pcm) >= 10:
+          # if openpilot is lower than stock by 10 or less
+          elif (CS.stock_set_speed - CS.v_cruise_pcm) >= 10:
             fake_button = 3
-          if 0 < (CS.stock_set_speed - CS.v_cruise_pcm) < 10:
+          else:
             fake_button = 2
 
       # disengage ACC when OP is disengaged
       if pcm_cancel_cmd:
         fake_button = 1
+
       # turn main on if off
       if not CS.main_on and CS.ready:
         fake_button = 1
@@ -106,10 +109,6 @@ class CarController():
       # unstick previous mocked button press
       if fake_button != 0 and fake_button == self.fake_button_prev:
         fake_button = 0
-
-      # spam resume when stopped and engaged
-      if enabled and (CS.v_ego_raw * CV.MS_TO_KPH) <= 1:
-        fake_button = 4
 
       self.fake_button_prev = fake_button
 

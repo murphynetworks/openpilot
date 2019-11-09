@@ -90,12 +90,13 @@ class CarController():
           # if openpilot is higher than stock by 10 or greater
           if (target_speed - CS.stock_set_speed) >= 10:
             fake_button = 5
-          # if openpilot is lower than stock by 10 or less
-          elif 0 < (target_speed - CS.stock_set_speed) < 10:
+          # if openpilot is set higher than stock between 1 and 10
+          elif 1 <= (target_speed - CS.stock_set_speed) < 10:
             fake_button = 4
-          # if openpilot is lower than stock by 10 or less
+          # if openpilot is lower than stock by 10 or greater
           elif (CS.stock_set_speed - target_speed) >= 10:
             fake_button = 3
+          # if openpilot is lower than stock by 10 or less
           else:
             fake_button = 2
 

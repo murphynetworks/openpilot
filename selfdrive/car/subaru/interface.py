@@ -53,10 +53,9 @@ class CarInterface(CarInterfaceBase):
     # was never released
     ret.enableCamera = True
 
+    ret.steerRateCost = 0.7
     ret.steerMaxBP = [0.] # m/s
     ret.steerMaxV = [1.]
-    tire_stiffness_factor = 1.0
-    ret.steerRateCost = 0.7
     ret.centerToFront = ret.wheelbase * 0.5
     ret.transmissionType = car.CarParams.TransmissionType.automatic
 
@@ -73,6 +72,7 @@ class CarInterface(CarInterfaceBase):
       ret.mass = 1568 + STD_CARGO_KG
       ret.wheelbase = 2.67
       ret.steerRatio = 14
+      tire_stiffness_factor = 1.0
       ret.steerActuatorDelay = 0.2
       ret.lateralTuning.pid.kf = 0.000043
       ret.lateralTuning.pid.kiBP, ret.lateralTuning.pid.kpBP = [[0., 10., 20.], [0., 10., 20.]]
@@ -82,6 +82,7 @@ class CarInterface(CarInterfaceBase):
       ret.mass = 1568 + STD_CARGO_KG
       ret.wheelbase = 2.67
       ret.steerRatio = 14.5
+      tire_stiffness_factor = 1.0
       ret.steerActuatorDelay = 0.15
       ret.lateralTuning.pid.kf = 0.00005
       ret.lateralTuning.pid.kiBP, ret.lateralTuning.pid.kpBP = [[0., 20.], [0., 20.]]

@@ -47,7 +47,6 @@ class CarInterface(CarInterfaceBase):
 
     ret.enableCruise = True
     ret.steerLimitAlert = True
-    ret.openpilotLongitudinalControl = False
 
     # force openpilot to fake the stock camera, since car harness is not supported yet and old style giraffe (with switches)
     # was never released
@@ -58,7 +57,6 @@ class CarInterface(CarInterfaceBase):
     tire_stiffness_factor = 1.0
     ret.steerRateCost = 0.7
     ret.centerToFront = ret.wheelbase * 0.5
-    ret.transmissionType = car.CarParams.TransmissionType.automatic
 
     if candidate in [CAR.IMPREZA]:
       ret.mass = 1568. + STD_CARGO_KG

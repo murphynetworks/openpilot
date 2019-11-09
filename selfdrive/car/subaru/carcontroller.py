@@ -35,7 +35,7 @@ class CarController():
     self.params = CarControllerParams(car_fingerprint)
     self.packer = CANPacker(DBC[car_fingerprint]['pt'])
 
-  def update(self, enabled, CS, frame, actuators, pcm_cancel_cmd, visual_alert, left_line, right_line):
+  def update(self, enabled, CS, frame, actuators, v_acc_sol, pcm_cancel_cmd, visual_alert, left_line, right_line):
     """ Controls thread """
 
     P = self.params
@@ -82,18 +82,19 @@ class CarController():
     if (frame % 5) == 0 and self.car_fingerprint in (CAR.OUTBACK, CAR.LEGACY):
       # 1 = main, 2 = set shallow/slow down 1, 3 = set deep/slow down 10, 4 = resume shallow/speed up 1, 5 = resume deep/speed up 10
       fake_button = CS.button
-      if enabled and (CS.v_ego_raw * CV.MS_TO_KPH) > 1 and (frame % 25) == 0:
+      if enabled and (CS.v_ego_raw * CV.MS_TO_KPH) > 1 and (frame % 30) == 0:
+        target_speed = (min(CS.v_cruise_pcm, max(v_acc_sol * CV.MS_TO_KPH, 30))
         # change stock speed to match openpilot set speed
         # if stock is less than openpilot, press resume to raise speed
-        if CS.stock_set_speed != CS.v_cruise_pcm:
+        if CS.stock_set_speed != target_speed:
           # if openpilot is higher than stock by 10 or greater
-          if (CS.v_cruise_pcm - CS.stock_set_speed) >= 10:
+          if (target_speed - CS.stock_set_speed) >= 10:
             fake_button = 5
           # if openpilot is lower than stock by 10 or less
-          elif 0 < (CS.v_cruise_pcm - CS.stock_set_speed) < 10:
+          elif 0 < (target_speed - CS.stock_set_speed) < 10:
             fake_button = 4
           # if openpilot is lower than stock by 10 or less
-          elif (CS.stock_set_speed - CS.v_cruise_pcm) >= 10:
+          elif (CS.stock_set_speed - target_speed) >= 10:
             fake_button = 3
           else:
             fake_button = 2

@@ -80,7 +80,8 @@ class CarInterface(CarInterfaceBase):
       ret.lateralTuning.pid.kiBP, ret.lateralTuning.pid.kpBP = [[0., 10., 20.], [0., 10., 20.]]
       ret.lateralTuning.pid.kpV, ret.lateralTuning.pid.kiV = [[0.01, 0.05, 0.2], [0.003, 0.018, 0.025]]
       ret.steerMaxBP = [0.] # m/s
-      ret.steerMaxV = [0.0294]
+      ret.steerMaxV = [1.]
+      ret.openpilotLongitudinalControl = True
 
     if candidate in [CAR.LEGACY]:
       ret.mass = 1568 + STD_CARGO_KG
@@ -103,14 +104,12 @@ class CarInterface(CarInterfaceBase):
     ret.gasMaxV = [0.]
     ret.brakeMaxBP = [0.]
     ret.brakeMaxV = [0.]
-    ret.longitudinalTuning.deadzoneBP = [0.]
-    ret.longitudinalTuning.deadzoneV = [0.]
-    ret.longitudinalTuning.kpBP = [0.]
-    ret.longitudinalTuning.kpV = [0.]
-    ret.longitudinalTuning.kiBP = [0.]
-    ret.longitudinalTuning.kiV = [0.]
-
-    # end from gm
+    ret.longitudinalTuning.deadzoneBP = [0.] #
+    ret.longitudinalTuning.deadzoneV = [0.] #
+    ret.longitudinalTuning.kpV = [3.6, 2.4, 1.5]
+    ret.longitudinalTuning.kpBP = [0., 5., 35.]
+    ret.longitudinalTuning.kiV = [0.54, 0.36]
+    ret.longitudinalTuning.kiBP = [0., 35.]
 
     # TODO: get actual value, for now starting with reasonable value for
     # civic and scaling by mass and wheelbase
@@ -221,7 +220,7 @@ class CarInterface(CarInterfaceBase):
     return ret.as_reader()
 
   def apply(self, c):
-    can_sends = self.CC.update(c.enabled, self.CS, self.frame, c.actuators,
+    can_sends = self.CC.update(c.enabled, self.CS, self.frame, c.actuators, c.v_acc_sol,
                                c.cruiseControl.cancel, c.hudControl.visualAlert,
                                c.hudControl.leftLaneVisible, c.hudControl.rightLaneVisible)
     self.frame += 1

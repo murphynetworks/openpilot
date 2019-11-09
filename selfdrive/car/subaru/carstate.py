@@ -205,7 +205,7 @@ class CarState():
       # 1 = main, 2 = set shallow, 3 = set deep, 4 = resume shallow, 5 = resume deep
       self.stock_set_speed = cp_cam.vl["ES_DashStatus"]["Cruise_Set_Speed"]
 
-      if self.acc_active and self.v_cruise_pcm < 30:
+      if self.acc_active and 145 < self.v_cruise_pcm < 30:
         self.v_cruise_pcm = self.stock_set_speed
       if self.acc_active and self.button in [2,3,4,5] and self.button_count == 0:
         if self.button in [2, 4] and not self.button_prev in [3,5]:
@@ -222,7 +222,7 @@ class CarState():
           # round up to the nearest 10
           self.v_cruise_pcm = (int(self.v_cruise_pcm / 10) + 1) * 10
       #set cruise speed to current speed
-      if self.acc_active and not self.acc_active_prev and self.stock_set_speed and self.button not in [4, 5]:
+      if self.acc_active and not self.acc_active_prev and self.button not in [4, 5]:
         self.v_cruise_pcm = self.v_ego * CV.MS_TO_KPH
         # change set speed at 5hz instead of 100hz 
       if self.button == self.button_prev and self.button_count <= 20:

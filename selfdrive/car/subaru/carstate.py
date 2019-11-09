@@ -208,17 +208,15 @@ class CarState():
       if self.acc_active and self.v_cruise_pcm == 0:
         self.v_cruise_pcm = self.stock_set_speed
       if self.acc_active and self.button in [2,3,4,5] and self.button_count == 0:
-        if self.button in [2, 4] and not self.button_prev in [3,5]:
-          if self.button == 2:
+        if self.button == 2:
             self.v_cruise_pcm = (int(self.v_cruise_pcm / 5) - 1) * 5
-          else: # button 4
-            self.v_cruise_pcm = (int(self.v_cruise_pcm / 5) + 1) * 5
         elif self.button == 3:
-          self.v_cruise_pcm = (int(self.v_cruise_pcm / 10) - 1) * 10
+            self.v_cruise_pcm = (int(self.v_cruise_pcm / 10) - 1) * 10
+        elif self.button == 4:
+          self.v_cruise_pcm = (int(self.v_cruise_pcm / 5) + 1) * 5
         else:     # button 5
           self.v_cruise_pcm = (int(self.v_cruise_pcm / 10) + 1) * 10
-      #set cruise speed to current speed
-      if self.acc_active and not self.acc_active_prev and self.stock_set_speed and self.button not in [4, 5]:
+      if self.acc_active and not self.acc_active_prev:
         self.v_cruise_pcm = self.v_ego * CV.MS_TO_KPH
         # change set speed at 5hz instead of 100hz 
       if self.button == self.button_prev and self.button_count <= 20:

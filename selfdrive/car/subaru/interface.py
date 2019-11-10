@@ -50,7 +50,6 @@ class CarInterface(CarInterfaceBase):
     # force openpilot to fake the stock camera, since car harness is not supported yet and old style giraffe (with switches)
     # was never released
     ret.enableCamera = True
-    ret.transmissionType = car.CarParams.TransmissionType.automatic
     ret.openpilotLongitudinalControl = False
 
     ret.steerRateCost = 0.7
@@ -216,7 +215,7 @@ class CarInterface(CarInterfaceBase):
     return ret.as_reader()
 
   def apply(self, c):
-    can_sends = self.CC.update(c.enabled, self.CS, self.frame, c.actuators, c.v_acc,
+    can_sends = self.CC.update(c.enabled, self.CS, self.frame, c.actuators,
                                c.cruiseControl.cancel, c.hudControl.visualAlert,
                                c.hudControl.leftLaneVisible, c.hudControl.rightLaneVisible)
     self.frame += 1

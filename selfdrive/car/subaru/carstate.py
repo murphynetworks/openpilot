@@ -47,8 +47,14 @@ def get_powertrain_can_parser(CP):
 
 
 def get_powertrain_two_can_parser(CP):
+  signals = [
+  ]
+
+  checks = [
+  ]
+
   if CP.carFingerprint == CAR.OUTBACKG:
-    signals = [
+    signals += [
       ("Cruise_On", "CruiseControl", 0),
       ("Cruise_Activated", "CruiseControl", 0),
       ("FL", "Wheel_Speeds", 0),
@@ -63,7 +69,7 @@ def get_powertrain_two_can_parser(CP):
       ("Signal3", "ES_Distance", 0),
     ]
 
-    checks = [
+    checks += [
       ("CruiseControl", 20),
       ("Wheel_Speeds", 50),
     ]

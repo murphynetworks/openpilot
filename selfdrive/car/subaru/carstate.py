@@ -159,7 +159,6 @@ class CarState():
       self.v_wheel_rr = cp_two.vl["Wheel_Speeds"]['RR'] * CV.KPH_TO_MS
       self.acc_active = cp_two.vl["CruiseControl"]['Cruise_Activated']
       self.main_on = cp_two.vl["CruiseControl"]['Cruise_On']
-      self.es_distance_counter = cp_two.vl["ES_Distance"]['Counter']
       self.es_distance_msg = copy.copy(cp_two.vl["ES_Distance"])
 
     else:
@@ -169,8 +168,7 @@ class CarState():
       self.v_wheel_rr = cp.vl["Wheel_Speeds"]['RR'] * CV.KPH_TO_MS
       self.acc_active = cp.vl["CruiseControl"]['Cruise_Activated']
       self.main_on = cp.vl["CruiseControl"]['Cruise_On']
-      self.es_distance_counter = cp.vl["ES_Distance"]['Counter']
-      self.es_distance_msg = copy.copy(cp.vl["ES_Distance"])
+      self.es_distance_msg = copy.copy(cp_cam.vl["ES_Distance"])
 
     self.v_cruise_pcm = cp_cam.vl["ES_DashStatus"]['Cruise_Set_Speed']
     # 1 = imperial, 6 = metric

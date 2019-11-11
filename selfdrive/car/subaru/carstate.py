@@ -159,6 +159,7 @@ class CarState():
       self.v_wheel_rr = cp_two.vl["Wheel_Speeds"]['RR'] * CV.KPH_TO_MS
       self.acc_active = cp_two.vl["CruiseControl"]['Cruise_Activated']
       self.main_on = cp_two.vl["CruiseControl"]['Cruise_On']
+      self.es_distance_counter = cp_two.vl["ES_Distance"]['Counter']
       self.es_distance_msg = copy.copy(cp_two.vl["ES_Distance"])
 
     else:
@@ -168,6 +169,7 @@ class CarState():
       self.v_wheel_rr = cp.vl["Wheel_Speeds"]['RR'] * CV.KPH_TO_MS
       self.acc_active = cp.vl["CruiseControl"]['Cruise_Activated']
       self.main_on = cp.vl["CruiseControl"]['Cruise_On']
+      self.es_distance_counter = cp.vl["ES_Distance"]['Counter']
       self.es_distance_msg = copy.copy(cp.vl["ES_Distance"])
 
     self.v_cruise_pcm = cp_cam.vl["ES_DashStatus"]['Cruise_Set_Speed']
@@ -193,6 +195,7 @@ class CarState():
     self.right_blinker_on = cp.vl["Dashlights"]['RIGHT_BLINKER'] == 1
     self.seatbelt_unlatched = cp.vl["Dashlights"]['SEATBELT_FL'] == 1
     self.steer_torque_driver = cp.vl["Steering_Torque"]['Steer_Torque_Sensor']
+    self.es_lkas_counter = cp.vl["ES_LKAS_State"]['Counter']
     self.steer_override = abs(self.steer_torque_driver) > STEER_THRESHOLD[self.car_fingerprint]
     self.angle_steers = cp.vl["Steering_Torque"]['Steering_Angle']
     self.door_open = any([cp.vl["BodyInfo"]['DOOR_OPEN_RR'],

@@ -4,7 +4,7 @@ from selfdrive.config import Conversions as CV
 from selfdrive.controls.lib.drive_helpers import create_event, EventTypes as ET
 from selfdrive.controls.lib.vehicle_model import VehicleModel
 from selfdrive.car.subaru.values import CAR
-from selfdrive.car.subaru.carstate import CarState, get_powertrain_can_parser, get_camera_can_parser
+from selfdrive.car.subaru.carstate import CarState, get_powertrain_can_parser, get_powertrain_two_can_parser, get_camera_can_parser
 from selfdrive.car import STD_CARGO_KG, scale_rot_inertia, scale_tire_stiffness, gen_empty_fingerprint
 from selfdrive.car.interfaces import CarInterfaceBase
 
@@ -22,6 +22,7 @@ class CarInterface(CarInterfaceBase):
     self.CS = CarState(CP)
     self.VM = VehicleModel(CP)
     self.pt_cp = get_powertrain_can_parser(CP)
+    self.pt_two = get_powertrain_two_can_parser(CP)
     self.cam_cp = get_camera_can_parser(CP)
 
     self.gas_pressed_prev = False
@@ -39,7 +40,6 @@ class CarInterface(CarInterfaceBase):
     ret = car.CarParams.new_message()
 
     ret.carName = "subaru"
-    ret.radarOffCan = True
     ret.carFingerprint = candidate
     ret.carVin = vin
     ret.isPandaBlack = has_relay
@@ -55,6 +55,18 @@ class CarInterface(CarInterfaceBase):
     ret.steerRateCost = 0.7
 
     if candidate in [CAR.IMPREZA]:
+      ret.mass = 1568. + STD_CARGO_KG
+      ret.wheelbase = 2.67
+      ret.centerToFront = ret.wheelbase * 0.5
+      ret.steerRatio = 15
+      ret.steerActuatorDelay = 0.4   # end-to-end angle controller
+      ret.lateralTuning.pid.kf = 0.00005
+      ret.lateralTuning.pid.kiBP, ret.lateralTuning.pid.kpBP = [[0., 20.], [0., 20.]]
+      ret.lateralTuning.pid.kpV, ret.lateralTuning.pid.kiV = [[0.2, 0.3], [0.02, 0.03]]
+      ret.steerMaxBP = [0.] # m/s
+      ret.steerMaxV = [1.]
+
+    if candidate in [CAR.OUTBACKG]:
       ret.mass = 1568. + STD_CARGO_KG
       ret.wheelbase = 2.67
       ret.centerToFront = ret.wheelbase * 0.5
@@ -97,14 +109,15 @@ class CarInterface(CarInterfaceBase):
   # returns a car.CarState
   def update(self, c, can_strings):
     self.pt_cp.update_strings(can_strings)
+    self.pt_two.update_strings(can_strings)
     self.cam_cp.update_strings(can_strings)
 
-    self.CS.update(self.pt_cp, self.cam_cp)
+    self.CS.update(self.pt_cp, self.pt_two, self.cam_cp)
 
     # create message
     ret = car.CarState.new_message()
 
-    ret.canValid = self.pt_cp.can_valid and self.cam_cp.can_valid
+    ret.canValid = self.pt_cp.can_valid and self.pt_two.can_valid and self.cam_cp.can_valid
 
     # speeds
     ret.vEgo = self.CS.v_ego
@@ -170,7 +183,6 @@ class CarInterface(CarInterfaceBase):
       events.append(create_event('pcmEnable', [ET.ENABLE]))
     if not self.CS.acc_active:
       events.append(create_event('pcmDisable', [ET.USER_DISABLE]))
-
     # disable on gas pedal rising edge
     if (ret.gasPressed and not self.gas_pressed_prev):
       events.append(create_event('pedalPressed', [ET.NO_ENTRY, ET.USER_DISABLE]))

@@ -61,12 +61,12 @@ class CarController():
       self.apply_steer_last = apply_steer
 
     if self.car_fingerprint not in (CAR.OUTBACKG):
-      if self.es_distance_cnt != CS.es_distance_counter:
+      if self.es_distance_cnt != CS.es_distance_msg["Counter"]:
         can_sends.append(subarucan.create_es_distance(self.packer, CS.es_distance_msg, pcm_cancel_cmd))
-        self.es_distance_cnt = CS.es_distance_counter
+        self.es_distance_cnt = CS.es_distance_msg["Counter"]
 
-    if self.es_lkas_cnt != CS.es_lkas_counter:
+    if self.es_lkas_cnt != CS.es_lkas_msg["Counter"]:
       can_sends.append(subarucan.create_es_lkas(self.packer, CS.es_lkas_msg, visual_alert, left_line, right_line))
-      self.es_lkas_cnt = CS.es_lkas_counter
+      self.es_lkas_cnt = CS.es_lkas_msg["Counter"]
 
     return can_sends

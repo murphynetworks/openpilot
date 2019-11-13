@@ -40,6 +40,7 @@ class CarInterface(CarInterfaceBase):
     ret = car.CarParams.new_message()
 
     ret.carName = "subaru"
+    ret.radarOffCan = False
     ret.carFingerprint = candidate
     ret.carVin = vin
     ret.isPandaBlack = has_relay
@@ -184,7 +185,7 @@ class CarInterface(CarInterfaceBase):
     if not self.CS.acc_active:
       events.append(create_event('pcmDisable', [ET.USER_DISABLE]))
     # disable on gas pedal rising edge
-    if (ret.gasPressed and not self.gas_pressed_prev):
+    if ret.gasPressed and not self.gas_pressed_prev:
       events.append(create_event('pedalPressed', [ET.NO_ENTRY, ET.USER_DISABLE]))
 
     if ret.gasPressed:

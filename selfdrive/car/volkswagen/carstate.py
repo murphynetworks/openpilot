@@ -161,11 +161,9 @@ def get_extended_can_parser(CP, canbus, networkModel):
 
   elif networkModel == NETWORK_MODEL.PQ:
     signals = [
-      ("GRA_Set_Speed", "ACC_XX02", 0),                 # ACC cruise set point from J428 ACC radar
     ]
 
     checks = [
-      ("ACC_XX02", 50),         # From J428 ACC radar control module
     ]
 
   else:
@@ -389,7 +387,7 @@ class CarState():
 
     # Update ACC setpoint. When the setpoint reads as 255, the driver has not
     # yet established an ACC setpoint, so treat it as zero.
-    self.accSetSpeed = ex_cp.vl["ACC_XX02"]['GRA_Set_Speed']
+    self.accSetSpeed = 0
     if self.accSetSpeed == 255:
       self.accSetSpeed = 0
 

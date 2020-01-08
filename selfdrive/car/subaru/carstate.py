@@ -1,7 +1,7 @@
 import copy
 from common.kalman.simple_kalman import KF1D
 from selfdrive.config import Conversions as CV
-from selfdrive.can.parser import CANParser
+from opendbc.can.parser import CANParser
 from selfdrive.car.subaru.values import CAR, DBC, STEER_THRESHOLD
 
 def get_powertrain_can_parser(CP):
@@ -37,13 +37,15 @@ def get_powertrain_can_parser(CP):
   ]
 
   if CP.carFingerprint == CAR.IMPREZA:
+    signals += [
+      ("Units", "Dash_State", 1),
+    ]
     checks += [
       ("BodyInfo", 10),
       ("CruiseControl", 20),
-      ("Units", "Dash_State", 1),
     ]
 
-  else:
+  if CP.carFingerprint in [CAR.OUTBACK, CAR.LEGACY]:
     signals += [
       ("LKA_Lockout", "Steering_Torque", 0),
     ]
@@ -82,6 +84,10 @@ def get_camera_can_parser(CP):
       ("Signal3", "ES_LKAS_State", 0),
       ("LKAS_ENABLE_2", "ES_LKAS_State", 0),
       ("Signal4", "ES_LKAS_State", 0),
+      ("LKAS_Left_Line_Visible", "ES_LKAS_State", 0),
+      ("Signal6", "ES_LKAS_State", 0),
+      ("LKAS_Right_Line_Visible", "ES_LKAS_State", 0),
+      ("Signal7", "ES_LKAS_State", 0),
       ("FCW_Cont_Beep", "ES_LKAS_State", 0),
       ("FCW_Repeated_Beep", "ES_LKAS_State", 0),
       ("Throttle_Management_Activated", "ES_LKAS_State", 0),
@@ -127,9 +133,6 @@ class CarState():
     self.prev_left_blinker_on = False
     self.right_blinker_on = False
     self.prev_right_blinker_on = False
-    self.steer_torque_driver = 0
-    self.steer_not_allowed = False
-    self.main_on = False
 
     # vEgo kalman filter
     dt = 0.01
@@ -189,14 +192,14 @@ class CarState():
       self.es_lkas_msg = copy.copy(cp_cam.vl["ES_LKAS_State"])
       # 1 = imperial, 6 = metric
       if cp.vl["Dash_State"]['Units'] == 1:
-        self.v_cruise_pcm *= CV.MPH_TO_KPH     
+        self.v_cruise_pcm *= CV.MPH_TO_KPH
 
     if self.car_fingerprint in [CAR.OUTBACK, CAR.LEGACY]:
-      self.seatbelt_unlatched = False
+      self.seatbelt_unlatched = False # FIXME: stock ACC disengages on unlatch so this is fine for now, signal is currently missing
       self.v_cruise_pcm = cp_cam.vl["ES_DashStatus"]["Cruise_Set_Speed"]
       self.steer_not_allowed = cp.vl["Steering_Torque"]["LKA_Lockout"]
       self.button = cp_cam.vl["ES_CruiseThrottle"]["Button"]
       self.brake_hold = cp_cam.vl["ES_CruiseThrottle"]["Standstill"]
       self.close_distance = cp_cam.vl["ES_CruiseThrottle"]["CloseDistance"]
       self.es_accel_msg = copy.copy(cp_cam.vl["ES_CruiseThrottle"])
-      self.ready = not cp_cam.vl["ES_DashStatus"]["Not_Ready_Startup"] 
+      self.ready = not cp_cam.vl["ES_DashStatus"]["Not_Ready_Startup"]

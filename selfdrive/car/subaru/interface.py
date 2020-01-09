@@ -52,7 +52,7 @@ class CarInterface(CarInterfaceBase):
     ret.enableCamera = True
 
     ret.steerRateCost = 0.7
-    ret.steerLimitTimer = 0.4
+    ret.steerLimitTimer = 0.5
 
     if candidate in [CAR.IMPREZA]:
       ret.mass = 1568. + STD_CARGO_KG
@@ -93,20 +93,27 @@ class CarInterface(CarInterfaceBase):
     ret.steerControlType = car.CarParams.SteerControlType.torque
     ret.steerRatioRear = 0.
 
-    # No long control in subaru
-    ret.gasMaxBP = [0.]
-    ret.gasMaxV = [0.]
-    ret.brakeMaxBP = [0.]
-    ret.brakeMaxV = [0.]
+    # testing long control in subaru
+    ret.gasMaxBP = [0.]  # m/s
+    ret.gasMaxV = [1] # max gas allowed
+    ret.brakeMaxBP = [5., 20.]  # m/s
+    ret.brakeMaxV = [1., 0.8]   # max brake allowed
     ret.longitudinalTuning.deadzoneBP = [0.]
     ret.longitudinalTuning.deadzoneV = [0.]
-    ret.longitudinalTuning.kpBP = [0.]
-    ret.longitudinalTuning.kpV = [0.]
-    ret.longitudinalTuning.kiBP = [0.]
-    ret.longitudinalTuning.kiV = [0.]
+    ret.longitudinalTuning.kpBP = [0., 5., 35.]
+    ret.longitudinalTuning.kpV = [1.2, 0.8, 0.5]
+    ret.longitudinalTuning.kiBP = [0., 35.]
+    ret.longitudinalTuning.kiV = [0.18, 0.12]
 
-    # end from gm
+    ret.gasMaxBP = [0.]  # m/s
+    ret.gasMaxV = [1] # max gas allowed
+    ret.brakeMaxBP = [5., 20.]  # m/s
+    ret.brakeMaxV = [1., 0.8]   # max brake allowed
 
+    ret.stoppingControl = True
+    ret.directAccelControl = False
+    ret.startAccel = 0.0
+    
     # TODO: get actual value, for now starting with reasonable value for
     # civic and scaling by mass and wheelbase
     ret.rotationalInertia = scale_rot_inertia(ret.mass, ret.wheelbase)

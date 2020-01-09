@@ -70,12 +70,63 @@ def create_es_lkas(packer, es_lkas_msg, visual_alert, left_line, right_line):
 
   return packer.make_can_msg("ES_LKAS_State", 0, values)
 
-def create_es_throttle_control(packer, fake_button, es_accel_msg):
+def create_brake(packer, frame, enabled, error, brake):
+  
+  #counts from 0 to 7 then back to 0
+  idx = (frame / 5) % 8
+  values = {
+    "Counter": idx,
+    "Brake_Pressure": brake,
+    "Brake_Light": 1 if brake > 0 else 0,
+    "ES_Error": error,
+    "Brake_On": 1 if brake > 0 else 0,
+    "Cruise_Activated": enabled,
+  }
+  values["Checksum"] = subaru_preglobal_checksum(packer, values, "ES_Brake")
 
-  values = copy.copy(es_accel_msg)
-  values["Button"] = fake_button
+  return packer.make_can_msg("ES_Brake", 0, values)
 
+
+def create_es_throttle_control(packer, enabled, es_throttle, fake_button, throttle, brake):
+
+  values = copy.copy(es_throttle)
+  values = {
+    "Button": fake_button,
+    "Throttle_Cruise": throttle,
+    "Cruise_Activatedish": 0,
+    "NEW_SIGNAL_9": not enabled, 
+    "Unknown": not enabled,
+    "Brake_On": 1 if brake > 0 else 0,
+    "NEW_SIGNAL_1": 0,
+    "Standstill": 0,
+    "Standstill_2": 0,
+  }
   values["Checksum"] = subaru_preglobal_checksum(packer, values, "ES_CruiseThrottle")
 
   return packer.make_can_msg("ES_CruiseThrottle", 0, values)
+
+
+def create_es_rpm_control(packer, frame, enabled, brake, rpm):
   
+  #counts from 0 to 7 then back to 0
+  idx = (frame / 5) % 8
+
+  values = {
+    "Brake": 1 if brake > 0 else 0,
+    "Cruise_Activated": enabled,
+    "RPM": rpm,
+    "Counter": idx,
+  }
+  values["Checksum"] = subaru_preglobal_checksum(packer, values, "ES_RPM")
+
+  return packer.make_can_msg("ES_RPM", 0, values)
+
+
+def create_es_dash_control(packer, enabled, es_dash, fake_button, throttle, brake):
+
+  values = copy.copy(es_dash)
+  values = {
+    "NEW_SIGNAL_1": not enabled,
+  }
+
+  return packer.make_can_msg("ES_DashStatus", 0, values)

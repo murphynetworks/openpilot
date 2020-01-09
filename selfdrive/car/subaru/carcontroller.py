@@ -65,6 +65,14 @@ class CarController():
 
       can_sends.append(subarucan.create_steering_control(self.packer, CS.CP.carFingerprint, apply_steer, frame, P.STEER_STEP))
 
+    ### BRAKE ###
+
+    if (frame % 5) == 0 and self.car_fingerprint in (CAR.OUTBACK, CAR.LEGACY):
+      brake = max((actuators.brake * 1024), CS.brake_pressure)
+
+      can_sends.append(subarucan.create_brake(self.packer, frame, enabled, CS.es_brake_error, brake))
+
+
     ### DISENGAGE ###
 
     if self.car_fingerprint == CAR.IMPREZA:
@@ -89,7 +97,21 @@ class CarController():
         fake_button = 0
       self.fake_button_prev = fake_button
 
-      can_sends.append(subarucan.create_es_throttle_control(self.packer, fake_button, CS.es_accel_msg))
+    ### GAS ###
+
+      if enabled and CS.main_on and not brake > 0:
+        throttle = max(actuators.gas * 2048 + 1818, 1818)
+      else:
+        throttle = 0
+
+      can_sends.append(subarucan.create_es_throttle_control(self.packer, enabled, CS.es_accel_msg, fake_button, throttle, brake))
+    
+    ### RPM ###
+
+    if (frame % 5) == 0 and self.car_fingerprint in (CAR.OUTBACK, CAR.LEGACY):
+
+      can_sends.append(subarucan.create_es_rpm_control(self.packer, frame, enabled, brake, CS.rpm))
+
 
     ### ALERTS ###
 

@@ -48,6 +48,7 @@ def get_powertrain_can_parser(CP):
   if CP.carFingerprint in [CAR.OUTBACK, CAR.LEGACY]:
     signals += [
       ("LKA_Lockout", "Steering_Torque", 0),
+      ("Transmission_Engine", "Transmission", 0),
     ]
     checks += [
       ("CruiseControl", 50),
@@ -118,6 +119,12 @@ def get_camera_can_parser(CP):
       ("Standstill_2", "ES_CruiseThrottle", 0),
       ("Throttle_Cruise", "ES_CruiseThrottle", 0),
       ("Not_Ready_Startup", "ES_DashStatus", 0),
+      ("Part_1", "ES_DashStatus", 0),
+      ("Part_2", "ES_DashStatus", 0),
+      ("Part_3", "ES_DashStatus", 0),
+      ("Part_4", "ES_DashStatus", 0),
+      ("Cruise_On_2", "ES_DashStatus", 0),
+      ("ES_Error", "ES_Brake", 0),
     ]
 
   return CANParser(DBC[CP.carFingerprint]['pt'], signals, checks, 2)
@@ -196,10 +203,20 @@ class CarState():
 
     if self.car_fingerprint in [CAR.OUTBACK, CAR.LEGACY]:
       self.seatbelt_unlatched = False # FIXME: stock ACC disengages on unlatch so this is fine for now, signal is currently missing
-      self.v_cruise_pcm = cp_cam.vl["ES_DashStatus"]["Cruise_Set_Speed"]
       self.steer_not_allowed = cp.vl["Steering_Torque"]["LKA_Lockout"]
       self.button = cp_cam.vl["ES_CruiseThrottle"]["Button"]
       self.brake_hold = cp_cam.vl["ES_CruiseThrottle"]["Standstill"]
       self.close_distance = cp_cam.vl["ES_CruiseThrottle"]["CloseDistance"]
       self.es_accel_msg = copy.copy(cp_cam.vl["ES_CruiseThrottle"])
+      self.es_brake_error = cp_cam.vl["ES_Brake"]["ES_Error"]
+      self.rpm = cp.vl["Transmission"]["Transmission_Engine"]
+
       self.ready = not cp_cam.vl["ES_DashStatus"]["Not_Ready_Startup"]
+      self.v_cruise_pcm = cp_cam.vl["ES_DashStatus"]["Cruise_Set_Speed"]
+      self.es_dash_1 = cp_cam.vl["ES_DashStatus"]["Part_1"]
+      self.es_dash_2 = cp_cam.vl["ES_DashStatus"]["Part_2"]
+      self.es_dash_3 = cp_cam.vl["ES_DashStatus"]["Part_3"]
+      self.es_dash_4 = cp_cam.vl["ES_DashStatus"]["Part_4"]
+      self.es_dash_error = cp_cam.vl["ES_DashStatus"]["Cruise_On_2"]
+      self.es_throttle = copy.copy(cp_cam.vl["ES_CruiseThrottle"])
+      self.es_dash = copy.copy(cp_cam.vl["ES_DashStatus"])

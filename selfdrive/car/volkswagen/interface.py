@@ -114,7 +114,7 @@ class CarInterface(CarInterfaceBase):
 
       # Additional common PQ35/PQ46/NMS parameters that may be overridden per-vehicle
       ret.steerRateCost = 1.0
-      ret.steerActuatorDelay = 0.05
+      ret.steerActuatorDelay = 0.2
       ret.steerMaxBP = [0.]  # m/s
       ret.steerMaxV = [1.]
 
@@ -140,9 +140,9 @@ class CarInterface(CarInterfaceBase):
       ret.wheelbase = 2.71
       ret.centerToFront = ret.wheelbase * 0.45
       ret.steerRatio = 15.6
-      ret.lateralTuning.pid.kf = 0.00006
-      ret.lateralTuning.pid.kpV = [0.10, 0.20, 0.40]
-      ret.lateralTuning.pid.kiV = [0.05, 0.05, 0.05]
+      ret.lateralTuning.pid.kf = 0.000058
+      ret.lateralTuning.pid.kpV = [0.10, 0.20, 0.45]
+      ret.lateralTuning.pid.kiV = [0.05, 0.05, 0.07]
       tire_stiffness_factor = 0.6
 
     ret.enableCamera = True # Stock camera detection doesn't apply to VW

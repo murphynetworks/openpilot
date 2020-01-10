@@ -94,8 +94,8 @@ def create_es_throttle_control(packer, enabled, es_throttle, fake_button, thrott
     "Button": fake_button,
     "Throttle_Cruise": throttle,
     "Cruise_Activatedish": 0,
-    "NEW_SIGNAL_9": not enabled, 
-    "Unknown": not enabled,
+    "NEW_SIGNAL_9": 0, 
+    "Unknown": 0,
     "Brake_On": 1 if brake > 0 else 0,
     "NEW_SIGNAL_1": 0,
     "Standstill": 0,
@@ -125,8 +125,8 @@ def create_es_rpm_control(packer, frame, enabled, brake, rpm):
 def create_es_dash_control(packer, enabled, part_1, part_2, part_3, part_4, error, v_cruise_pcm, ready):
 
   values = {
-    "Not_Ready_Startup": not ready,
-    "NEW_SIGNAL_1": not enabled,
+    "Not_Ready_Startup": 0,
+    "NEW_SIGNAL_1": 0,
     "Part_1": part_1,
     "Part_2": part_2,
     "Part_3": part_3,

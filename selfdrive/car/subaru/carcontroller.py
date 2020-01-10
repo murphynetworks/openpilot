@@ -68,7 +68,10 @@ class CarController():
     ### BRAKE ###
 
     if (frame % 5) == 0 and self.car_fingerprint in (CAR.OUTBACK, CAR.LEGACY):
-      brake = max((actuators.brake * 1024), CS.brake_pressure)
+      if enabled:
+        brake = actuators.brake * 1024
+      else:
+        brake = 0
 
       can_sends.append(subarucan.create_brake(self.packer, frame, enabled, CS.es_brake_error, brake))
 
@@ -99,10 +102,11 @@ class CarController():
 
     ### GAS ###
 
-      if enabled and CS.main_on and not brake > 0:
-        throttle = max(actuators.gas * 2048 + 1818, 1818)
+      if enabled:
+        throttle = actuators.gas * 2048 + 1818
       else:
         throttle = 0
+      brake = brake + CS.brake_pressure
 
       can_sends.append(subarucan.create_es_throttle_control(self.packer, enabled, CS.es_accel_msg, fake_button, throttle, brake))
     

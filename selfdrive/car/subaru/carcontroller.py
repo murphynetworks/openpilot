@@ -105,7 +105,8 @@ class CarController():
       if enabled:
         throttle = actuators.gas * 2048 + 1818
       else:
-        throttle = 0
+        throttle = 808
+
       brake = brake + CS.brake_pressure
 
       can_sends.append(subarucan.create_es_throttle_control(self.packer, enabled, CS.es_accel_msg, fake_button, throttle, brake))

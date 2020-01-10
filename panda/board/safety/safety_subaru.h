@@ -8,7 +8,7 @@ const int SUBARU_MAX_RATE_DOWN = 70;
 const int SUBARU_DRIVER_TORQUE_ALLOWANCE = 60;
 const int SUBARU_DRIVER_TORQUE_FACTOR = 10;
 
-const AddrBus SUBARU_TX_MSGS[] = {{0x122, 0}, {0x160, 0}, {0x161, 0}, {0x162, 0}, {0x164, 0}, {0x166, 0}, {0x167,0}, {0x221, 0}, {0x322, 0}};
+const AddrBus SUBARU_TX_MSGS[] = {{0x122, 0}, {0x160, 0}, {0x161, 0}, {0x162, 0}, {0x164, 0}, {0x166, 0}, {0x221, 0}, {0x322, 0}};
 
 int subaru_cruise_engaged_last = 0;
 int subaru_rt_torque_last = 0;
@@ -125,7 +125,7 @@ static int subaru_fwd_hook(int bus_num, CAN_FIFOMailBox_TypeDef *to_fwd) {
       // 545 is ES_Distance
       // 802 is ES_LKAS
       int addr = GET_ADDR(to_fwd);
-      int block_msg = (addr == 290) || (addr == 353) || (addr == 0x160) || (addr == 0x162) || (addr == 0x166) || (addr == 0x167) || (addr == 356) || (addr == 545) || (addr == 802);
+      int block_msg = (addr == 290) || (addr == 353) || (addr == 0x160) || (addr == 0x162) || (addr == 0x166) || (addr == 356) || (addr == 545) || (addr == 802);
       if (!block_msg) {
         bus_fwd = 0;  // Main CAN
       }

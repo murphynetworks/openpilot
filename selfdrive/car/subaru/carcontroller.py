@@ -119,5 +119,9 @@ class CarController():
       if self.es_lkas_cnt != CS.es_lkas_msg["Counter"]:
         self.es_lkas_cnt = CS.es_lkas_msg["Counter"]
         can_sends.append(subarucan.create_es_lkas(self.packer, CS.es_lkas_msg, visual_alert, left_line, right_line))
+    
+    if (frame % 5) == 0 and self.car_fingerprint in (CAR.OUTBACK, CAR.LEGACY):
+
+      can_sends.append(subarucan.create_es_dash_control(self.packer, enabled, CS.es_dash))
 
     return can_sends

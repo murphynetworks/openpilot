@@ -122,7 +122,7 @@ def create_es_rpm_control(packer, frame, enabled, brake, rpm):
   return packer.make_can_msg("ES_RPM", 0, values)
 
 
-def create_es_dash_control(packer, enabled, es_dash, fake_button, throttle, brake):
+def create_es_dash_control(packer, enabled, es_dash):
 
   values = copy.copy(es_dash)
   values = {

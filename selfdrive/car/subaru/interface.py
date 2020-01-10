@@ -205,6 +205,8 @@ class CarInterface(CarInterfaceBase):
       events.append(create_event('pcmEnable', [ET.ENABLE]))
     if not self.CS.acc_active:
       events.append(create_event('pcmDisable', [ET.USER_DISABLE]))
+    if self.CS.brake_error:
+      events.append(create_event('brakeUnavailable', [ET.NO_ENTRY, ET.IMMEDIATE_DISABLE, ET.PERMANENT]))
 
     # disable on gas pedal rising edge
     if (ret.gasPressed and not self.gas_pressed_prev):
@@ -223,8 +225,10 @@ class CarInterface(CarInterfaceBase):
     return ret.as_reader()
 
   def apply(self, c):
+
     can_sends = self.CC.update(c.enabled, self.CS, self.frame, c.actuators,
                                c.cruiseControl.cancel, c.hudControl.visualAlert,
-                               c.hudControl.leftLaneVisible, c.hudControl.rightLaneVisible)
+                               c.hudControl.leftLaneVisible, c.hudControl.rightLaneVisible, 
+                               hud_show_car=c.hudControl.leadVisible)
     self.frame += 1
     return can_sends

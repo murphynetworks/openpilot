@@ -49,6 +49,8 @@ def get_powertrain_can_parser(CP):
     signals += [
       ("LKA_Lockout", "Steering_Torque", 0),
       ("Transmission_Engine", "Transmission", 0),
+      ("Gear", "Transmission", 0),
+      ("Not_Brake_Error", "Brake_Type", 0),
     ]
     checks += [
       ("CruiseControl", 50),
@@ -140,6 +142,10 @@ class CarState():
     self.prev_left_blinker_on = False
     self.right_blinker_on = False
     self.prev_right_blinker_on = False
+    self.v_cruise_pcm = 0
+    self.acc_active_prev = 0
+    self.button_prev = 0
+    self.button_count = 0
 
     # vEgo kalman filter
     dt = 0.01
@@ -182,8 +188,6 @@ class CarState():
     self.right_blinker_on = cp.vl["Dashlights"]['RIGHT_BLINKER'] == 1
     self.steer_torque_driver = cp.vl["Steering_Torque"]['Steer_Torque_Sensor']
     self.steer_torque_motor = cp.vl["Steering_Torque"]['Steer_Torque_Output']
-    self.acc_active = cp.vl["CruiseControl"]['Cruise_Activated']
-    self.main_on = cp.vl["CruiseControl"]['Cruise_On']
     self.steer_override = abs(self.steer_torque_driver) > STEER_THRESHOLD[self.car_fingerprint]
     self.angle_steers = cp.vl["Steering_Torque"]['Steering_Angle']
     self.door_open = any([cp.vl["BodyInfo"]['DOOR_OPEN_RR'],
@@ -197,6 +201,8 @@ class CarState():
       self.steer_not_allowed = 0
       self.es_distance_msg = copy.copy(cp_cam.vl["ES_Distance"])
       self.es_lkas_msg = copy.copy(cp_cam.vl["ES_LKAS_State"])
+      self.acc_active = cp.vl["CruiseControl"]['Cruise_Activated']
+      self.main_on = cp.vl["CruiseControl"]['Cruise_On']
       # 1 = imperial, 6 = metric
       if cp.vl["Dash_State"]['Units'] == 1:
         self.v_cruise_pcm *= CV.MPH_TO_KPH
@@ -210,12 +216,53 @@ class CarState():
       self.es_accel_msg = copy.copy(cp_cam.vl["ES_CruiseThrottle"])
       self.es_brake_error = cp_cam.vl["ES_Brake"]["ES_Error"]
       self.rpm = cp.vl["Transmission"]["Transmission_Engine"]
+      self.brake_error = not cp.vl["Brake_Type"]["Not_Brake_Error"]
 
       self.ready = not cp_cam.vl["ES_DashStatus"]["Not_Ready_Startup"]
-      self.v_cruise_pcm = cp_cam.vl["ES_DashStatus"]["Cruise_Set_Speed"]
       self.es_dash_1 = cp_cam.vl["ES_DashStatus"]["Part_1"]
       self.es_dash_2 = cp_cam.vl["ES_DashStatus"]["Part_2"]
       self.es_dash_3 = cp_cam.vl["ES_DashStatus"]["Part_3"]
       self.es_dash_4 = cp_cam.vl["ES_DashStatus"]["Part_4"]
       self.es_dash_error = cp_cam.vl["ES_DashStatus"]["Cruise_On_2"]
       self.es_throttle = copy.copy(cp_cam.vl["ES_CruiseThrottle"])
+      self.drive_gear = 1 if cp.vl["Transmission"]["Gear"] not in [0, 14, 15] else 0
+
+      # button states: 1 = main, 2 = set shallow, 3 = set deep, 4 = resume shallow, 5 = resume deep
+
+      self.main_on = 1
+      if self.button in [2, 3, 4, 5] and not self.acc_active_prev:
+        self.acc_active = 1 
+        self.v_cruise_pcm = v_wheel
+
+      if self.acc_active and self.button in [2,3,4,5] and self.button_count == 0:
+        if self.button in [2, 4] and not self.button_prev in [3,5]:
+          if self.button == 2:
+          # round down to the nearest 5 
+            self.v_cruise_pcm = (int(self.v_cruise_pcm / 5) - 1) * 5
+          else:    # button 4
+          # round up to the nearest 5 
+            self.v_cruise_pcm = (int(self.v_cruise_pcm / 5) + 1) * 5
+        elif self.button == 3:
+          # round down to the nearest 10
+          self.v_cruise_pcm = (int(self.v_cruise_pcm / 10) - 1) * 10
+        else:      # button 5
+          # round up to the nearest 10
+          self.v_cruise_pcm = (int(self.v_cruise_pcm / 10) + 1) * 10
+      # round to the lowest multiple of 5 if set speed is not a multiple of 5
+      if self.v_cruise_pcm % 5 != 0:
+        self.v_cruise_pcm = (int(self.v_cruise_pcm / 5) - 1) * 5
+      # change set speed at 3hz instead of 100hz 
+      if self.button == self.button_prev and self.button_count <= 30:
+        self.button_count =+ 1
+      else:
+        self.button_count = 0 
+      self.button_prev = self.button
+      self.acc_active_prev = self.acc_active
+
+      # Ensure set speed is within limits
+      if 145 < self.v_cruise_pcm < 30:
+        self.v_cruise_pcm = max(min(self.v_cruise_pcm, 145), 30)
+
+      if any(self.brake_pressed, self.user_gas_pressed, self.button == 1, not self.drive_gear):
+        self.acc_active = 0
+      

@@ -89,17 +89,20 @@ def create_brake(packer, frame, enabled, error, brake):
 
 def create_es_throttle_control(packer, enabled, es_throttle, fake_button, throttle, brake):
 
-  values = copy.copy(es_throttle)
+  #counts from 0 to 7 then back to 0
+  idx = (frame / 5) % 8
+
   values = {
-    "Button": fake_button,
     "Throttle_Cruise": throttle,
-    "Cruise_Activatedish": 0,
-    "NEW_SIGNAL_9": 0, 
-    "Unknown": 0,
+    "Button": fake_button,
     "Brake_On": 1 if brake > 0 else 0,
     "NEW_SIGNAL_1": 0,
     "Standstill": 0,
     "Standstill_2": 0,
+    "SET_1": 0,
+    "CloseDistance": 5,
+    "Counter": idx,
+
   }
   values["Checksum"] = subaru_preglobal_checksum(packer, values, "ES_CruiseThrottle")
 
@@ -122,15 +125,19 @@ def create_es_rpm_control(packer, frame, enabled, brake, rpm):
   return packer.make_can_msg("ES_RPM", 0, values)
 
 
-def create_es_dash_control(packer, enabled, part_1, part_2, part_3, part_4, error, v_cruise_pcm, ready):
-
+def create_es_dash_control(packer, frame, enabled, part_1, part_2, part_3, part_4, error, v_cruise_pcm, ready, lead_car, brake):
+  
+  #counts from 0 to 7 then back to 0
+  idx = (frame / 5) % 8
+  
   values = {
-    "Not_Ready_Startup": 0,
-    "NEW_SIGNAL_1": 0,
-    "Part_1": part_1,
-    "Part_2": part_2,
-    "Part_3": part_3,
-    "Part_4": part_4,
+    "Cruise_On": 1,
+    "Cruise_On_2": 1,
+    "Cruise_Activated": enabled,
+    "Distance_Bars": 1,
+    "Cruise_Set_Speed": v_cruise_pcm,
+    "Lead_Car": lead_car,
+    "NEW_SIGNAL_1": 1 if brake > 0 else 0,
+    "Counter": = idx
   }
-
   return packer.make_can_msg("ES_DashStatus", 0, values)

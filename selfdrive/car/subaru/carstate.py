@@ -225,7 +225,7 @@ class CarState():
       self.es_dash_4 = cp_cam.vl["ES_DashStatus"]["Part_4"]
       self.es_dash_error = cp_cam.vl["ES_DashStatus"]["Cruise_On_2"]
       self.es_throttle = copy.copy(cp_cam.vl["ES_CruiseThrottle"])
-      self.drive_gear = 1 if cp.vl["Transmission"]["Gear"] not in [0, 14, 15] else 0
+      self.not_drive_gear = 1 if cp.vl["Transmission"]["Gear"] in [0, 14, 15] else 0
 
       # button states: 1 = main, 2 = set shallow, 3 = set deep, 4 = resume shallow, 5 = resume deep
 
@@ -265,6 +265,6 @@ class CarState():
       if 145 < self.v_cruise_pcm < 30:
         self.v_cruise_pcm = max(min(self.v_cruise_pcm, 145), 30)
 
-      if any(self.brake_pressed, self.user_gas_pressed, self.button == 1, not self.drive_gear):
+      if self.brake_pressed or self.user_gas_pressed or self.button == 1 or self.not_drive_gear > 0:
         self.acc_active = 0
       

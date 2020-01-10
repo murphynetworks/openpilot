@@ -87,7 +87,7 @@ def create_brake(packer, frame, enabled, error, brake):
   return packer.make_can_msg("ES_Brake", 0, values)
 
 
-def create_es_throttle_control(packer, enabled, es_throttle, fake_button, throttle, brake):
+def create_es_throttle_control(packer, frame, enabled, es_throttle, fake_button, throttle, brake):
 
   #counts from 0 to 7 then back to 0
   idx = (frame / 5) % 8
@@ -138,6 +138,7 @@ def create_es_dash_control(packer, frame, enabled, part_1, part_2, part_3, part_
     "Cruise_Set_Speed": v_cruise_pcm,
     "Lead_Car": lead_car,
     "NEW_SIGNAL_1": 1 if brake > 0 else 0,
-    "Counter": = idx
+    "Counter": idx,
+    "Obstacle_Distance": 5,
   }
   return packer.make_can_msg("ES_DashStatus", 0, values)

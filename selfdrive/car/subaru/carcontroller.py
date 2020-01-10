@@ -109,7 +109,7 @@ class CarController():
 
       brake = brake + CS.brake_pressure
 
-      can_sends.append(subarucan.create_es_throttle_control(self.packer, enabled, CS.es_accel_msg, fake_button, throttle, brake))
+      can_sends.append(subarucan.create_es_throttle_control(self.packer, frame, enabled, CS.es_accel_msg, fake_button, throttle, brake))
     
     ### RPM ###
 

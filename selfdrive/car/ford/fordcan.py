@@ -1,8 +1,6 @@
-import struct
 from common.numpy_fast import clip
+from selfdrive.car.ford.values import MAX_ANGLE
 
-# *** Ford specific ***
-MAX_ANGLE = 87.  # make sure we never command the extremes (0xfff) which cause latching fault
 
 def create_steer_command(packer, angle_cmd, enabled, lkas_state, angle_steers, curvature, lkas_action):
   """Creates a CAN message for the Ford Steer Command."""

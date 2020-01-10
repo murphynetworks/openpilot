@@ -2,7 +2,7 @@ from cereal import log
 from common.numpy_fast import clip, interp
 from selfdrive.controls.lib.pid import PIController
 
-LongCtrlState = log.Live100Data.LongControlState
+LongCtrlState = log.ControlsState.LongControlState
 
 STOPPING_EGO_SPEED = 0.5
 MIN_CAN_SPEED = 0.3  # TODO: parametrize this in car interface
@@ -55,7 +55,7 @@ def long_control_state_trans(active, long_control_state, v_ego, v_target, v_pid,
   return long_control_state
 
 
-class LongControl(object):
+class LongControl():
   def __init__(self, CP, compute_gb):
     self.long_control_state = LongCtrlState.off  # initialized to off
     self.pid = PIController((CP.longitudinalTuning.kpBP, CP.longitudinalTuning.kpV),

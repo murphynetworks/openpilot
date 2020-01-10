@@ -1,24 +1,26 @@
-from common.numpy_fast import clip, interp
 from cereal import car
-from selfdrive.boardd.boardd import can_list_to_can_capnp
-from selfdrive.car.ford.fordcan import create_steer_command, create_lkas_ui, \
-                                       spam_cancel_button
-from selfdrive.can.packer import CANPacker
+from selfdrive.car.ford.fordcan import create_steer_command, create_lkas_ui
+from opendbc.can.packer import CANPacker
 
 
 MAX_STEER_DELTA = 1
 TOGGLE_DEBUG = False
 
-class CarController(object):
-  def __init__(self, car_fingerprint):
+class CarController():
+  def __init__(self, dbc_name, enable_camera, vehicle_model):
+    self.packer = CANPacker(dbc_name)
+    self.enable_camera = enable_camera
     self.enabled_last = False
     self.main_on_last = False
-    self.car_fingerprint = car_fingerprint
+    self.vehicle_model = vehicle_model
+    self.generic_toggle_last = 0
+    self.steer_alert_last = False
+    self.lkas_action = 0
 
-  def update(self, sendcan, enabled, CS, frame, actuators):
+  def update(self, enabled, CS, frame, actuators, visual_alert, pcm_cancel):
 
     can_sends = []
-    steer_alert = False
+    steer_alert = visual_alert == car.CarControl.HUDControl.VisualAlert.steerRequired
 
     apply_steer = actuators.steer
 
@@ -41,4 +43,4 @@ class CarController(object):
       self.main_on_last = CS.main_on
       self.steer_alert_last = steer_alert
 
-      sendcan.send(can_list_to_can_capnp(can_sends, msgtype='sendcan').to_bytes())
+    return can_sends

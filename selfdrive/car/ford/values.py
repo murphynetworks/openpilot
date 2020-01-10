@@ -19,6 +19,13 @@ FINGERPRINTS = {
   }],
 }
 
+class ECU:
+  CAM = 0
+
+ECU_FINGERPRINT = {
+  ECU.CAM: [970, 973, 984]
+}
+
 DBC = {
   CAR.FUSION: dbc_dict('ford_fusion_2018_pt', 'ford_fusion_2018_adas'),
   CAR.EXPLORER: dbc_dict('ford_explorer_2013', 'ford_explorer_2013'),

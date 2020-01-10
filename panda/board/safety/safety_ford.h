@@ -67,7 +67,7 @@ static void ford_rx_hook(CAN_FIFOMailBox_TypeDef *to_push) {
 //     block all commands that produce actuation
 */
 static int ford_tx_hook(CAN_FIFOMailBox_TypeDef *to_send) {
-
+  UNUSED(to_send);
   int tx = 1;
 /*
   int addr = GET_ADDR(to_send);

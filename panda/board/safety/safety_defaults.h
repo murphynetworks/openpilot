@@ -23,17 +23,8 @@ static int nooutput_tx_lin_hook(int lin_num, uint8_t *data, int len) {
 }
 
 static int default_fwd_hook(int bus_num, CAN_FIFOMailBox_TypeDef *to_fwd) {
-  UNUSED(to_fwd);
-  int bus_fwd = -1;
-  if (bus_num == 0) {
-    bus_fwd = 2;  // Camera CAN
-  }
-  if (bus_num == 2) {
-   bus_fwd = 0;  // Main CAN
-  }
-
-  // fallback to do not forward
-  return bus_fwd;
+  UNUSED(bus_num);
+  return -1;
 }
 
 const safety_hooks nooutput_hooks = {

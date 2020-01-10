@@ -122,6 +122,6 @@ class CarController():
     
     if (frame % 5) == 0 and self.car_fingerprint in (CAR.OUTBACK, CAR.LEGACY):
 
-      can_sends.append(subarucan.create_es_dash_control(self.packer, enabled, CS.es_dash))
+      can_sends.append(subarucan.create_es_dash_control(self.packer, enabled, CS.es_dash_1, CS.es_dash_2, CS.es_dash_3, CS.es_dash_4, CS.es_dash_error, CS.v_cruise_pcm, CS.ready))
 
     return can_sends

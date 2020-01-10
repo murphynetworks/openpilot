@@ -122,11 +122,15 @@ def create_es_rpm_control(packer, frame, enabled, brake, rpm):
   return packer.make_can_msg("ES_RPM", 0, values)
 
 
-def create_es_dash_control(packer, enabled, es_dash):
+def create_es_dash_control(packer, enabled, part_1, part_2, part_3, part_4, error, v_cruise_pcm, ready):
 
-  values = copy.copy(es_dash)
   values = {
+    "Not_Ready_Startup": not ready,
     "NEW_SIGNAL_1": not enabled,
+    "Part_1": part_1,
+    "Part_2": part_2,
+    "Part_3": part_3,
+    "Part_4": part_4,
   }
 
   return packer.make_can_msg("ES_DashStatus", 0, values)

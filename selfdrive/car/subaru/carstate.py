@@ -219,4 +219,3 @@ class CarState():
       self.es_dash_4 = cp_cam.vl["ES_DashStatus"]["Part_4"]
       self.es_dash_error = cp_cam.vl["ES_DashStatus"]["Cruise_On_2"]
       self.es_throttle = copy.copy(cp_cam.vl["ES_CruiseThrottle"])
-      self.es_dash = copy.copy(cp_cam.vl["ES_DashStatus"])

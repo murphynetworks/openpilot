@@ -233,6 +233,8 @@ class CarState():
       if self.button in [2, 3, 4, 5] and not self.acc_active_prev:
         self.acc_active = 1 
         self.v_cruise_pcm = v_wheel
+      else:
+        self.acc_active = 0
 
       if self.acc_active and self.button in [2,3,4,5] and self.button_count == 0:
         if self.button in [2, 4] and not self.button_prev in [3,5]:

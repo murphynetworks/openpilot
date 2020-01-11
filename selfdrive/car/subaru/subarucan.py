@@ -136,7 +136,7 @@ def create_es_dash_control(packer, frame, enabled, part_1, part_2, part_3, part_
     "Cruise_Activated": enabled,
     "Distance_Bars": 1,
     "Cruise_Set_Speed": v_cruise_pcm,
-    "Lead_Car": lead_car,
+    "Lead_Car": 0,
     "NEW_SIGNAL_1": 1 if brake > 0 else 0,
     "Counter": idx,
     "Obstacle_Distance": 5,

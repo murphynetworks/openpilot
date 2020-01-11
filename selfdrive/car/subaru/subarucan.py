@@ -125,7 +125,7 @@ def create_es_rpm_control(packer, frame, enabled, brake, rpm):
   return packer.make_can_msg("ES_RPM", 0, values)
 
 
-def create_es_dash_control(packer, frame, enabled, part_1, part_2, part_3, part_4, error, v_cruise_pcm, ready, lead_car, brake):
+def create_es_dash_control(packer, frame, enabled, part_1, part_2, part_3, part_4, error, v_cruise_pcm, ready, brake):
   
   #counts from 0 to 7 then back to 0
   idx = (frame / 5) % 8

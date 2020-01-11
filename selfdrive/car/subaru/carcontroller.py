@@ -34,7 +34,7 @@ class CarController():
     self.params = CarControllerParams(car_fingerprint)
     self.packer = CANPacker(DBC[car_fingerprint]['pt'])
 
-  def update(self, enabled, CS, frame, actuators, pcm_cancel_cmd, visual_alert, left_line, right_line, lead_car):
+  def update(self, enabled, CS, frame, actuators, pcm_cancel_cmd, visual_alert, left_line, right_line):
     """ Controls thread """
 
     P = self.params
@@ -127,6 +127,6 @@ class CarController():
     
     if (frame % 5) == 0 and self.car_fingerprint in (CAR.OUTBACK, CAR.LEGACY):
 
-      can_sends.append(subarucan.create_es_dash_control(self.packer, frame, enabled, CS.es_dash_1, CS.es_dash_2, CS.es_dash_3, CS.es_dash_4, CS.es_dash_error, CS.v_cruise_pcm, CS.ready, lead_car, CS.brake_pressure))
+      can_sends.append(subarucan.create_es_dash_control(self.packer, frame, enabled, CS.es_dash_1, CS.es_dash_2, CS.es_dash_3, CS.es_dash_4, CS.es_dash_error, CS.v_cruise_pcm, CS.ready, CS.brake_pressure))
 
     return can_sends
